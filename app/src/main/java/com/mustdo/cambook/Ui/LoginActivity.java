@@ -8,7 +8,6 @@ import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
-import android.widget.Toast;
 
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
@@ -117,11 +116,11 @@ public class LoginActivity extends Activity implements GoogleApiClient.OnConnect
         //facebook
         callbackManager = CallbackManager.Factory.create();
         LoginButton loginButton = binding.fbLoginBtn;
-        loginButton.setReadPermissions("email", "public_profile", "user_birthday");
+        loginButton.setReadPermissions("email", "public_profile");
         loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
-                Log.i("TTT", "FB=> 엑세스토큰: " + loginResult.getAccessToken().getToken());
+                U.log( "FB=> 엑세스토큰: " + loginResult.getAccessToken().getToken());
                 onFaceBookInfoWithAccessToken(loginResult.getAccessToken());
             }
 
@@ -147,10 +146,10 @@ public class LoginActivity extends Activity implements GoogleApiClient.OnConnect
                 FirebaseUser user = firebaseAuth.getCurrentUser();
                 if (user != null) {
                     // User is signed in
-                    Log.d("TTT", "onAuthStateChanged:signed_in:" + user.getUid());
+                    U.log( "onAuthStateChanged:signed_in:" + user.getUid());
                 } else {
                     // User is signed out
-                    Log.d("TTT", "onAuthStateChanged:signed_out");
+                    U.log( "onAuthStateChanged:signed_out");
                 }
                 // ...
             }
@@ -185,7 +184,7 @@ public class LoginActivity extends Activity implements GoogleApiClient.OnConnect
                                     @Override
                                     public void onSuccess(Void aVoid) {
 
-                                        U.toast(context, "firestone ok");
+                                        U.toast(context, "firestore ok");
                                         stopPd();
                                         startActivity(new Intent(context, MainActivity.class));
                                         finish();
@@ -195,7 +194,7 @@ public class LoginActivity extends Activity implements GoogleApiClient.OnConnect
                                     @Override
                                     public void onFailure(@NonNull Exception e) {
 
-                                        U.toast(context, "firestone fail" + e.getMessage());
+                                        U.toast(context, "firestore fail" + e.getMessage());
                                         stopPd();
                                     }
                                 });
@@ -267,21 +266,19 @@ public class LoginActivity extends Activity implements GoogleApiClient.OnConnect
     // google
     // 초기화
     public void initGoogleLoginInit() {
-        // [START config_signin]
-        // Configure Google Sign In
+
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.default_web_client_id))
                 .requestEmail()
                 .build();
-        // [END config_signin]
+
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .enableAutoManage(this /* FragmentActivity */, this /* OnConnectionFailedListener */)
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build();
 
-        // [START initialize_auth]
         mAuth = FirebaseAuth.getInstance();
-        // [END initialize_auth]
+
     }
 
     // google
@@ -291,7 +288,7 @@ public class LoginActivity extends Activity implements GoogleApiClient.OnConnect
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-        Log.d("TTT", "연결 실패 => 재시도 같은 시나리오 필요:" + connectionResult);
+        U.log( "연결 실패 => 재시도 같은 시나리오 필요:" + connectionResult);
     }
 
     // google
@@ -305,10 +302,7 @@ public class LoginActivity extends Activity implements GoogleApiClient.OnConnect
     // google
     // 로그인 성공후 호출 코드
     private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
-        Log.d("TTT", "firebaseAuthWithGoogle:" + acct.getId());
-        // [START_EXCLUDE silent]
-        //showProgressDialog();
-        // [END_EXCLUDE]
+        U.log("firebaseAuthWithGoogle:" + acct.getId());
         AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
         mAuth.signInWithCredential(credential)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
@@ -317,10 +311,10 @@ public class LoginActivity extends Activity implements GoogleApiClient.OnConnect
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
                             FirebaseUser user = mAuth.getCurrentUser();
-                            Log.i("TTT", "" + user.getDisplayName());
-                            Log.i("TTT", "" + user.getEmail());
-                            Log.i("TTT", "" + user.getUid());
-                            Log.i("TTT", "" + user.getPhotoUrl().toString());
+                            U.log("" + user.getDisplayName());
+                            U.log( "" + user.getEmail());
+                            U.log("" + user.getUid());
+                            U.log( "" + user.getPhotoUrl().toString());
 
                             User u = new User(user.getUid(), null, user.getEmail(), user.getDisplayName());
 
@@ -333,7 +327,7 @@ public class LoginActivity extends Activity implements GoogleApiClient.OnConnect
                                         @Override
                                         public void onSuccess(Void aVoid) {
 
-                                            U.toast(context, "firestone ok");
+                                            //U.toast(context, "firestore ok");
                                             stopPd();
                                             startActivity(new Intent(context, MainActivity.class));
                                             finish();
@@ -343,14 +337,14 @@ public class LoginActivity extends Activity implements GoogleApiClient.OnConnect
                                         @Override
                                         public void onFailure(@NonNull Exception e) {
                                             stopPd();
-                                            U.toast(context, "firestone fail" + e.getMessage());
+                                            U.toast(context, "firestore fail" + e.getMessage());
 
                                         }
                                     });
 
                         } else {
                             // If sign in fails, display a message to the user.
-                            Toast.makeText(context, "Authentication failed.", Toast.LENGTH_SHORT).show();
+                            U.toast(context, ""+task.getException().getMessage());
                             stopPd();
                         }
 
@@ -370,16 +364,17 @@ public class LoginActivity extends Activity implements GoogleApiClient.OnConnect
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (!task.isSuccessful()) {
-                            Log.i("TTT", "signInWithCredential", task.getException());
-                            Toast.makeText(context, "Authentication failed.",
-                                    Toast.LENGTH_SHORT).show();
+                            U.log("signInWithCredential"+task.getException());
+                            U.getInstance().toast(context, ""+task.getException().getMessage());
+
                         } else {
-                            Log.i("TTT", "파이어베이스 페북 로그인 완료 => 개인정보 획득");
+                            U.log( "파이어베이스 페북 로그인 완료 => 개인정보 획득");
                             if (Profile.getCurrentProfile() != null) {
                                 Log.i("TTT", " " + Profile.getCurrentProfile().getName());
                                 Log.i("TTT", " " + Profile.getCurrentProfile().getLinkUri());
                                 Log.i("TTT", " " + Profile.getCurrentProfile().getProfilePictureUri(100, 100));
                                 Log.i("TTT", " " + Profile.getCurrentProfile().getId());
+
                             }
 
                             //개인정보 획득을위한 요청을 만듬
@@ -387,21 +382,55 @@ public class LoginActivity extends Activity implements GoogleApiClient.OnConnect
                                 @Override
                                 public void onCompleted(JSONObject object, GraphResponse response) {
                                     try {
-                                        Log.i("TTT", " " + object.getString("email"));
+                                        U.log( " " + object.getString("email"));
+                                        U.log(" " + object.getString("id"));
+                                        U.log(" " + object.getString("name"));
+                                        String email = object.getString("email");
+                                        String name = object.getString("name");
+                                        FirebaseUser user = mAuth.getCurrentUser();
+                                        User u = new User(user.getUid(), null, email, name);
+
+                                        //firestore 입력
+                                        FirebaseFirestore db = FirebaseFirestore.getInstance();
+                                        db.collection("users")
+                                                .document(user.getUid())
+                                                .set(u)
+                                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                    @Override
+                                                    public void onSuccess(Void aVoid) {
+
+                                                        U.toast(context, "firestone ok");
+                                                        stopPd();
+                                                        startActivity(new Intent(context, MainActivity.class));
+                                                        finish();
+                                                    }
+                                                })
+                                                .addOnFailureListener(new OnFailureListener() {
+                                                    @Override
+                                                    public void onFailure(@NonNull Exception e) {
+                                                        stopPd();
+                                                        U.toast(context, "firestone fail" + e.getMessage());
+
+                                                    }
+                                                });
+
+
                                     } catch (JSONException e) {
                                         e.printStackTrace();
+                                        stopPd();
                                     }
-                                    Log.i("TTT", "" + object.toString());
+                                    U.log( "" + object.toString());
 
                                 }
                             });
 
                             Bundle param = new Bundle();
-                            param.putString("fields", "email,id,name,gender,birthday");
+                            param.putString("fields", "email,id,name");
                             //요청 수행
                             request.setParameters(param);
                             request.executeAsync();
                         }
+
                     }
                 });
     }
@@ -410,17 +439,15 @@ public class LoginActivity extends Activity implements GoogleApiClient.OnConnect
     @Override
     public void onStart() {
         super.onStart();
-        // Check if user is signed in (non-null) and update UI accordingly.
-
         //google & facebook
         mAuth.addAuthStateListener(mAuthListener);
 
         FirebaseUser user = mAuth.getCurrentUser();
         if (user != null) {
-            Log.i("TTT", "" + user.getDisplayName());
-            Log.i("TTT", "" + user.getEmail());
-            Log.i("TTT", "" + user.getUid());
-            Log.i("TTT", "" + user.getPhotoUrl().toString());
+            U.log("" + user.getDisplayName());
+            U.log("" + user.getEmail());
+            U.log( "" + user.getUid());
+            U.log( "" + user.getPhotoUrl().toString());
             startActivity(new Intent(context, MainActivity.class));
             finish();
         }
