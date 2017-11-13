@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <RelativeLayout
+
+
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#ffffff"
+        android:orientation="vertical"
+        android:weightSum="10"
+        tools:context="com.mustdo.cambook.Ui.LoginActivity">
+
+
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="75dp"
+            android:text="@string/logo"
+            android:textColor="#5185C7"
+            android:textSize="30sp" />
+
+
+        <EditText
+            android:id="@+id/edit1"
+            android:layout_width="185dp"
+            android:layout_height="38dp"
+            android:layout_below="@+id/textView2"
+            android:layout_centerHorizontal="true"
+            android:layout_gravity="center"
+            android:layout_marginTop="56dp"
+            android:layout_weight="1"
+            android:background="@drawable/gray_underline"
+            android:gravity="center"
+            android:hint="@string/id_hint"
+            android:inputType="text"
+            android:singleLine="true"
+            android:textColorHint="#9b9b9b"
+            android:textColor="#000000"
+            android:textSize="13sp" />
+
+        <EditText
+            android:id="@+id/edit2"
+            android:layout_width="185dp"
+            android:layout_height="38dp"
+            android:layout_alignLeft="@+id/edit1"
+            android:layout_alignStart="@+id/edit1"
+            android:layout_below="@+id/edit1"
+            android:layout_gravity="center"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/gray_underline"
+            android:gravity="center"
+            android:hint="@string/pw_hint"
+            android:inputType="textPassword"
+            android:textColorHint="#9b9b9b"
+            android:textColor="#000000"
+            android:textSize="13sp" />
+
+        <Button
+            android:id="@+id/btn1"
+            android:layout_width="185dp"
+            android:layout_height="38dp"
+            android:layout_alignLeft="@+id/edit2"
+            android:layout_alignStart="@+id/edit2"
+            android:layout_below="@+id/edit2"
+            android:layout_gravity="center"
+            android:layout_marginTop="24dp"
+            android:layout_weight="1"
+            android:background="@mipmap/rect"
+            android:gravity="center"
+            android:text="@string/login"
+            android:textColor="#5185C7" />
+
+        <com.facebook.login.widget.LoginButton
+            android:id="@+id/fb_login_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/btn4"
+            android:layout_centerHorizontal="true"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="13dp" />
+
+        <com.google.android.gms.common.SignInButton
+            android:id="@+id/google"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/btn2"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="13dp" />
+
+        <Button
+            android:id="@+id/btn4"
+            android:layout_width="180dp"
+            android:layout_height="30dp"
+            android:layout_below="@+id/btn1"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="13dp"
+            android:background="#00000000"
+            android:text="@string/anony_btn"
+            android:textColor="@color/colorTitle"
+            android:textSize="10sp" />
+
+        <Button
+            android:id="@+id/btn2"
+            android:layout_width="185dp"
+            android:layout_height="38dp"
+            android:layout_above="@+id/btn3"
+            android:layout_alignLeft="@+id/fb_login_btn"
+            android:layout_alignStart="@+id/fb_login_btn"
+            android:layout_gravity="center"
+            android:layout_marginBottom="13dp"
+            android:layout_weight="1"
+            android:background="@null"
+            android:gravity="center"
+            android:onClick="onButtonClicked"
+            android:text="@string/signup"
+            android:textColor="#5185C7" />
+
+
+        <Button
+            android:id="@+id/btn3"
+            android:layout_width="180dp"
+            android:layout_height="30dp"
+            android:layout_alignLeft="@+id/btn2"
+            android:layout_alignParentBottom="true"
+            android:layout_alignStart="@+id/btn2"
+            android:layout_marginBottom="19dp"
+            android:background="#00000000"
+            android:text="@string/findid"
+            android:textColor="@color/colorTitle"
+            android:textSize="10sp" />
+    </RelativeLayout>
+</layout>

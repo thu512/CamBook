@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+<LinearLayout
+    android:id="@+id/activity_main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#4a4a4a"
+    android:orientation="vertical"
+    android:weightSum="100"
+    tools:context="com.mustdo.cambook.Ui.JoinActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="9.3"
+        android:background="@null"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:weightSum="100">
+
+        <android.support.v4.widget.Space
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="5.9" />
+
+        <ImageButton
+            android:id="@+id/back"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="3.3"
+            android:background="@mipmap/back_" />
+
+        <android.support.v4.widget.Space
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="23.3" />
+
+        <TextView
+            android:id="@+id/textView6"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="34.9"
+            android:gravity="center"
+            android:text="@string/signup"
+            android:textColor="#ffe715"
+            android:textSize="20.3sp" />
+    </LinearLayout>
+
+    <android.support.v4.widget.Space
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="9" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_gravity="center"
+        android:layout_weight="8.6"
+        android:background="@drawable/white_ract"
+        android:orientation="horizontal">
+
+
+        <android.support.v4.widget.Space
+            android:layout_width="29dp"
+            android:layout_height="match_parent" />
+
+        <TextView
+            android:layout_width="75dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:background="@null"
+            android:text="@string/email"
+            android:singleLine="true"
+            android:textSize="15sp"
+            android:textColor="#cccccc"
+            android:lineSpacingExtra="12sp"
+            android:textStyle="normal" />
+
+        <EditText
+            android:id="@+id/email"
+            android:layout_width="193.4dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:background="@null"
+            android:inputType="textEmailAddress"
+            android:singleLine="true"
+            android:textColor="#ffffff"
+            android:textSize="18.5sp"
+            android:paddingRight="5dp"
+            android:paddingLeft="5dp"
+            android:textCursorDrawable="@null"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_gravity="center"
+        android:layout_weight="8.6"
+        android:background="@drawable/white_ract"
+        android:orientation="horizontal">
+
+
+        <android.support.v4.widget.Space
+            android:layout_width="29dp"
+            android:layout_height="match_parent" />
+
+        <TextView
+            android:layout_width="75dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:background="@null"
+            android:lineSpacingExtra="12sp"
+            android:singleLine="true"
+            android:text="@string/pw"
+            android:textSize="15sp"
+            android:textColor="#cccccc"
+            android:textStyle="normal" />
+
+        <EditText
+            android:id="@+id/pwd"
+            android:layout_width="193.4dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:background="@null"
+            android:inputType="textPassword"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp"
+            android:singleLine="true"
+            android:textColor="#ffffff"
+            android:textCursorDrawable="@null"
+            android:textSize="18.5sp" />
+
+    </LinearLayout>
+
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_gravity="center"
+        android:layout_weight="8.6"
+        android:background="@drawable/white_ract"
+        android:orientation="horizontal">
+
+
+        <android.support.v4.widget.Space
+            android:layout_width="29dp"
+            android:layout_height="match_parent" />
+
+        <TextView
+            android:layout_width="75dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:background="@null"
+            android:text="@string/name"
+            android:singleLine="true"
+            android:textSize="15sp"
+            android:textColor="#cccccc"
+            android:lineSpacingExtra="12sp"
+            android:textStyle="normal" />
+
+        <EditText
+            android:id="@+id/name"
+            android:layout_width="193.4dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:background="@null"
+            android:inputType="textEmailAddress"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp"
+            android:singleLine="true"
+            android:textColor="#ffffff"
+            android:textCursorDrawable="@null"
+            android:textSize="18.5sp" />
+
+    </LinearLayout>
+    <android.support.v4.widget.Space
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="47.5"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="8.4"
+        android:orientation="horizontal"
+        android:background="#ffe715">
+
+        <Button
+            android:id="@+id/btn1"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="@string/signup_ok"
+            android:textSize="18.5sp"
+            android:textColor="#ffffff"
+            android:textStyle="bold"
+            android:background="@null" />
+    </LinearLayout>
+</LinearLayout>
+</layout>

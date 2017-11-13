@@ -1,0 +1,59 @@
+<resources>
+
+    <string name="app_name">캠북</string>
+
+    <string name="facebook_app_id">199038027306974</string>
+    <string name="fb_login_protocol_scheme">fb199038027306974</string>
+
+    <string name="logo">CamBook</string>
+
+    <string name="photo">사진촬영</string>
+    <string name="gallery">앨범</string>
+    <string name="timetable">시간표</string>
+    <string name="setting">설정</string>
+    <string name="login">로그인</string>
+
+    <string name="signup">회원가입</string>
+    <string name="id">아이디</string>
+    <string name="pw">비밀번호</string>
+    <string name="email">이메일</string>
+    <string name="name">이름</string>
+    <string name="signup_ok">가입</string>
+    <string name="anony_btn">비회원으로 이용하기</string>
+
+    <string name="id_hint">ID를 입력하세요</string>
+    <string name="pw_hint">비밀번호를 입력하세요</string>
+    <string name="findid">비밀번호를 잊으셨습니까?</string>
+    <string name="color_btn">배경색 선택</string>
+    <string name="add_sub">추가하기</string>
+    <string name="remove_sub">지우기</string>
+
+    <!--앨범 화면-->
+    <string name="pick_all_photo">모든 사진</string>
+    <string name="pick_photos">앨범</string>
+
+    <!--설정 화면-->
+    <string name="savephoto">사진 자동 저장</string>
+    <string name="lunchset">앱 실행 시 카메라 화면</string>
+    <string name="getphoto">사진 불러오기</string>
+    <string name="logout">로그아웃</string>
+    <string name="unregister">이메일 회원으로 전환</string>
+    <string name="set10">버전 정보</string>
+
+    <!--이미지 옵션메뉴-->
+    <string name="menu_edit">편집</string>
+    <string name="menu_move">이동</string>
+    <string name="menu_copy">복사</string>
+    <string name="menu_delete">삭제</string>
+    <string name="menu_save">저장</string>
+    <string name="menu_load">불러오기</string>
+    <string name="menu_select">앨범 선택</string>
+
+    <string name="cancel">취소</string>
+    <string name="submit">확인</string>
+
+
+    <string name="findpw">비밀번호 찾기</string>
+
+    <!--비밀번호 찾기-->
+</resources>
