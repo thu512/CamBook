@@ -99,13 +99,6 @@ public class LoginActivity extends Activity implements GoogleApiClient.OnConnect
             }
         });
 
-//        //비밀번호 찾기
-//        binding.btn3.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                startActivity(new Intent(LoginActivity.this,FindPwdActivity.class));
-//            }
-//        });
 
         //비회원 로그인
         binding.signin.setOnClickListener(new View.OnClickListener() {
@@ -298,7 +291,7 @@ public class LoginActivity extends Activity implements GoogleApiClient.OnConnect
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-        Log.d("T", "연결 실패 => 재시도 같은 시나리오 필요:" + connectionResult);
+        Log.d("TTT", "연결 실패 => 재시도 같은 시나리오 필요:" + connectionResult);
     }
 
     // google
@@ -312,7 +305,7 @@ public class LoginActivity extends Activity implements GoogleApiClient.OnConnect
     // google
     // 로그인 성공후 호출 코드
     private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
-        Log.d("T", "firebaseAuthWithGoogle:" + acct.getId());
+        Log.d("TTT", "firebaseAuthWithGoogle:" + acct.getId());
         // [START_EXCLUDE silent]
         //showProgressDialog();
         // [END_EXCLUDE]
@@ -324,10 +317,10 @@ public class LoginActivity extends Activity implements GoogleApiClient.OnConnect
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
                             FirebaseUser user = mAuth.getCurrentUser();
-                            Log.i("T", "" + user.getDisplayName());
-                            Log.i("T", "" + user.getEmail());
-                            Log.i("T", "" + user.getUid());
-                            Log.i("T", "" + user.getPhotoUrl().toString());
+                            Log.i("TTT", "" + user.getDisplayName());
+                            Log.i("TTT", "" + user.getEmail());
+                            Log.i("TTT", "" + user.getUid());
+                            Log.i("TTT", "" + user.getPhotoUrl().toString());
 
                             User u = new User(user.getUid(), null, user.getEmail(), user.getDisplayName());
 

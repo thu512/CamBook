@@ -90,8 +90,9 @@ public class JoinActivity extends Activity{
                     public void onSuccess(Void aVoid) {
                         stopPd();
                         U.getInstance().toast(getApplicationContext(), "firestone ok");
-
-                        startActivity(new Intent(getApplicationContext(),MainActivity.class));
+                        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(intent);
                         finish();
                     }
                 })
@@ -136,7 +137,7 @@ public class JoinActivity extends Activity{
                                 public void onSuccess(Void aVoid) {
                                     stopPd();
                                     Intent intent = new Intent(getApplicationContext(),StartActivity.class);
-                                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                                     startActivity(intent);
                                     finish();
                                 }
