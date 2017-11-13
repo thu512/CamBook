@@ -58,7 +58,6 @@
             android:layout_alignStart="@+id/btn4"
             android:layout_marginBottom="22dp"
             android:background="@mipmap/rect"
-            android:onClick="onButtonClicked"
             android:text="@string/timetable"
             android:textColor="#5185C7" />
 
