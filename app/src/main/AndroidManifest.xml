@@ -78,7 +78,8 @@
         <activity android:name=".Ui.AccountActivity" />
         <activity android:name=".Ui.TimeTableActivity" />
         <activity android:name=".Ui.AddSubjectActivity" />
-        <activity android:name=".Ui.DeleteSubjectActivity"></activity>
+        <activity android:name=".Ui.DeleteSubjectActivity" />
+        <activity android:name=".Ui.SettingActivity"></activity>
     </application>
 
 </manifest>

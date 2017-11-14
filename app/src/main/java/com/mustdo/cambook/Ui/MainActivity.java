@@ -25,7 +25,8 @@ public class MainActivity extends Activity {
         //시간표
         binding.btn3.setOnClickListener(view -> startActivity(new Intent(getApplicationContext(),TimeTableActivity.class)));
 
-
+        //설정
+        binding.btn4.setOnClickListener(view -> startActivity(new Intent(getApplicationContext(), SettingActivity.class)));
     }
 
 
