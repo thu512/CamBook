@@ -5,6 +5,10 @@ import android.content.SharedPreferences;
 import android.util.Log;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
+
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
 /**
@@ -32,6 +36,46 @@ public class U {
     {
         return context.getSharedPreferences(SAVE_TAG, 0).getBoolean(key, false);
     }
+
+    //ArrayList를 SP에 저장
+
+    public void saveSharedPreferences_Data(Context context, String key, ArrayList<String> dic) {
+
+
+
+        SharedPreferences pref =
+
+                context.getSharedPreferences(SAVE_TAG,0);
+
+        SharedPreferences.Editor edit = pref.edit();
+
+        Set<String> set = new HashSet<String>();
+
+        set.addAll(dic);
+
+        edit.putStringSet(key, set);
+
+        edit.commit();
+
+    }
+
+    //꺼내기
+
+    public ArrayList<String> loadSharedPreferencesData(Context context, String key) {
+
+
+
+        SharedPreferences pref =
+
+                context.getSharedPreferences(SAVE_TAG,0);
+
+        Set<String> set = pref.getStringSet(key, null);
+
+        return set==null? new ArrayList<>(): new ArrayList<>(set);
+
+    }
+
+
 
 
     //팝업 라이브러리
