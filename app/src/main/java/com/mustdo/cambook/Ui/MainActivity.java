@@ -19,7 +19,12 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         binding= DataBindingUtil.setContentView(this, R.layout.activity_main);
 
+        //계정설정
         binding.btn5.setOnClickListener(view -> startActivity(new Intent(getApplicationContext(),AccountActivity.class)));
+
+        //시간표
+        binding.btn3.setOnClickListener(view -> startActivity(new Intent(getApplicationContext(),TimeTableActivity.class)));
+
 
     }
 

@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context="com.mustdo.cambook.Ui.AddSubjectActivity"
+        android:background="#ffffff">
+        <android.support.constraint.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:orientation="horizontal"
+            android:background="#9b9b9b"
+            android:id="@+id/constraintLayout">
+
+            <ImageButton
+                android:id="@+id/back"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:background="@mipmap/left_arrow"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.05"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.5" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/addsub"
+                android:textSize="25sp"
+                android:textStyle="bold"
+                android:textColor="#ffffff"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </android.support.constraint.ConstraintLayout>
+
+        <RelativeLayout
+
+            android:id="@+id/relativeLayout4"
+            android:layout_width="215dp"
+            android:layout_height="55dp"
+            android:layout_alignLeft="@+id/relativeLayout6"
+            android:layout_alignStart="@+id/relativeLayout6"
+            android:layout_below="@+id/constraintLayout"
+            android:layout_marginTop="35dp"
+            android:background="@drawable/spinner_border">
+
+            <Spinner
+                android:id="@+id/spinner"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_gravity="center"
+                android:layout_marginLeft="5dp"
+                android:background="@android:color/transparent"
+                android:gravity="center"
+                android:spinnerMode="dropdown" />
+
+            <ImageView
+                android:layout_width="55dp"
+                android:layout_height="50dp"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:layout_gravity="center"
+                android:src="@mipmap/drop" />
+
+        </RelativeLayout>
+
+        <RelativeLayout
+
+            android:id="@+id/relativeLayout6"
+            android:layout_width="215dp"
+
+
+            android:layout_height="55dp"
+            android:layout_alignLeft="@+id/relativeLayout5"
+            android:layout_alignStart="@+id/relativeLayout5"
+            android:layout_below="@+id/relativeLayout4"
+            android:layout_marginTop="40dp"
+            android:background="@drawable/spinner_border">
+
+            <Spinner
+                android:id="@+id/spinner1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_gravity="center"
+                android:layout_marginLeft="5dp"
+                android:background="@android:color/transparent"
+                android:gravity="center"
+                android:spinnerMode="dropdown" />
+
+            <ImageView
+                android:layout_width="55dp"
+                android:layout_height="50dp"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:layout_gravity="center"
+                android:src="@mipmap/drop" />
+
+        </RelativeLayout>
+
+
+        <RelativeLayout
+            android:id="@+id/relativeLayout5"
+            android:layout_width="215dp"
+            android:layout_height="55dp"
+            android:layout_alignLeft="@+id/editText"
+            android:layout_alignStart="@+id/editText"
+            android:layout_below="@+id/relativeLayout6"
+            android:layout_marginTop="47dp"
+            android:background="@drawable/spinner_border">
+
+            <Spinner
+                android:id="@+id/spinner2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_gravity="center"
+                android:layout_marginLeft="5dp"
+                android:background="@android:color/transparent"
+                android:gravity="center"
+                android:spinnerMode="dropdown" />
+
+            <ImageView
+                android:layout_width="55dp"
+                android:layout_height="50dp"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:layout_gravity="center"
+                android:src="@mipmap/drop" />
+
+        </RelativeLayout>
+
+
+        <Button
+            android:id="@+id/colorView"
+            android:layout_width="215dp"
+            android:layout_height="55dp"
+
+            android:layout_above="@+id/submit"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="63dp"
+            android:background="@drawable/spinner_border"
+            android:gravity="center"
+            android:onClick="onSelectColor"
+            android:text="@string/color_btn"
+            android:textColor="#9b9b9b" />
+
+
+        <Button
+            android:id="@+id/submit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:background="@color/colorPrimaryDark"
+            android:onClick="onSubmit"
+            android:text="@string/add_sub"
+            android:textColor="#ffffff" />
+
+        <EditText
+            android:id="@+id/editText"
+            android:layout_width="215dp"
+            android:layout_height="55dp"
+            android:layout_alignLeft="@+id/colorView"
+            android:layout_alignStart="@+id/colorView"
+            android:layout_below="@+id/relativeLayout5"
+            android:layout_marginTop="53dp"
+            android:layout_span="2"
+            android:ems="10"
+            android:gravity="center"
+            android:hint="과목명을 입력하세요."
+            android:inputType="textPersonName"
+            android:textColorHint="#9b9b9b" />
+
+
+    </RelativeLayout>
+</layout>
