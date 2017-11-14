@@ -6,8 +6,6 @@ import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
-import android.util.Log;
-import android.view.View;
 
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
@@ -15,7 +13,6 @@ import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
 import com.facebook.GraphRequest;
-import com.facebook.GraphResponse;
 import com.facebook.Profile;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
@@ -26,12 +23,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -44,7 +36,6 @@ import com.mustdo.cambook.Util.U;
 import com.mustdo.cambook.databinding.ActivityLoginBinding;
 
 import org.json.JSONException;
-import org.json.JSONObject;
 
 public class LoginActivity extends Activity implements GoogleApiClient.OnConnectionFailedListener {
 
@@ -57,6 +48,11 @@ public class LoginActivity extends Activity implements GoogleApiClient.OnConnect
 
     private static U U;
 
+    // google
+    private static final int RC_SIGN_IN = 9001; // 구글 로그인 요청코드 (값은 변경 가능함)
+    private FirebaseAuth mAuth;                 // fb 인증 객체
+    private GoogleApiClient mGoogleApiClient;   // 구글 로그인 담당 객체(Api 담당 객체)
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -68,51 +64,34 @@ public class LoginActivity extends Activity implements GoogleApiClient.OnConnect
 
         firebaseAuth = FirebaseAuth.getInstance();
 
+        // google
+        initGoogleLoginInit();
 
         //google버튼모양
         binding.signInButton.setSize(SignInButton.SIZE_WIDE);
 
-        binding.signInButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                showPd();
-                onGoogleLogin();
-            }
-        });
+        //구글 로그인
+        binding.signInButton.setOnClickListener((view -> {
+            showPd();
+            onGoogleLogin();
+        }));
 
         //로그인버튼 클릭
-        binding.login.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                onLogin();
-            }
-
-        });
+        binding.login.setOnClickListener((view -> onLogin()));
 
         //회원가입버튼 클릭
-        binding.signupBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivity(new Intent(LoginActivity.this, JoinActivity.class));
-            }
-        });
+        binding.signupBtn.setOnClickListener((view -> startActivity(new Intent(LoginActivity.this, JoinActivity.class))));
 
+        //비밀번호 찾기
+        binding.findpw.setOnClickListener((view -> startActivity(new Intent(LoginActivity.this, FindPwdActivity.class))));
 
         //비회원 로그인
-        binding.signin.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                anonymouslySignUp();
-            }
-        });
+        binding.signin.setOnClickListener((view -> anonymouslySignUp()));
 
-        binding.fbLoginBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                showPd();
-            }
-        });
+        //페북 로그인 버튼 누르면 프로그래스바 띄우기
+        binding.fbLoginBtn.setOnClickListener((view -> showPd()));
+
+
         //facebook
         callbackManager = CallbackManager.Factory.create();
         LoginButton loginButton = binding.fbLoginBtn;
@@ -120,7 +99,7 @@ public class LoginActivity extends Activity implements GoogleApiClient.OnConnect
         loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
-                U.log( "FB=> 엑세스토큰: " + loginResult.getAccessToken().getToken());
+                U.log("FB=> 엑세스토큰: " + loginResult.getAccessToken().getToken());
                 onFaceBookInfoWithAccessToken(loginResult.getAccessToken());
             }
 
@@ -135,9 +114,6 @@ public class LoginActivity extends Activity implements GoogleApiClient.OnConnect
             }
         });
 
-        // google
-        initGoogleLoginInit();
-
 
         //구글 페북
         mAuthListener = new FirebaseAuth.AuthStateListener() {
@@ -146,70 +122,58 @@ public class LoginActivity extends Activity implements GoogleApiClient.OnConnect
                 FirebaseUser user = firebaseAuth.getCurrentUser();
                 if (user != null) {
                     // User is signed in
-                    U.log( "onAuthStateChanged:signed_in:" + user.getUid());
+                    U.log("onAuthStateChanged:signed_in:" + user.getUid());
                 } else {
                     // User is signed out
-                    U.log( "onAuthStateChanged:signed_out");
+                    U.log("onAuthStateChanged:signed_out");
                 }
-                // ...
             }
         };
 
+
     }
 
-
+    //익명가입 / 로그인
     public void anonymouslySignUp() {
         showPd();
 
         //익명 로그인을 진행하고 그 결과를 비동기적으로 받아서 결과를 리스너 객체를 통해 전달한다.
-        firebaseAuth.signInAnonymously().addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+        firebaseAuth.signInAnonymously().addOnCompleteListener(this, (task -> {
+            if (task.isSuccessful()) {
+                //성공 => 회원정보 획득
+                FirebaseUser user = getUser(); //firebaseAuth.getCurrentUser();
+                if (user != null) {
+                    U.log(user.getUid());
+                    U.log("" + user.isAnonymous());
+                    U.toast(LoginActivity.this, "익명계정 생성 성공.");
+                    User u = new User(user.getUid(), null, null, null);
 
-            @Override
-            public void onComplete(@NonNull Task<AuthResult> task) {
-                if (task.isSuccessful()) {
-                    //성공 => 회원정보 획득
-                    FirebaseUser user = getUser(); //firebaseAuth.getCurrentUser();
-                    if (user != null) {
-                        U.log(user.getUid());
-                        U.log("" + user.isAnonymous());
-                        U.toast(LoginActivity.this, "익명계정 생성 성공.");
-                        User u = new User(user.getUid(), null, null, null);
-
-                        //firestore 입력
-                        FirebaseFirestore db = FirebaseFirestore.getInstance();
-                        db.collection("users")
-                                .document(user.getUid())
-                                .set(u)
-                                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                    @Override
-                                    public void onSuccess(Void aVoid) {
-
-                                        U.toast(context, "firestore ok");
-                                        stopPd();
-                                        startActivity(new Intent(context, MainActivity.class));
-                                        finish();
-                                    }
-                                })
-                                .addOnFailureListener(new OnFailureListener() {
-                                    @Override
-                                    public void onFailure(@NonNull Exception e) {
-
-                                        U.toast(context, "firestore fail" + e.getMessage());
-                                        stopPd();
-                                    }
-                                });
-                    }
-                } else {
-                    //실패
-                    U.toast(LoginActivity.this, "익명계정 생성 실패.");
-                    stopPd();
+                    //firestore 입력
+                    FirebaseFirestore db = FirebaseFirestore.getInstance();
+                    db.collection("users")
+                            .document(user.getUid())
+                            .set(u)
+                            .addOnSuccessListener((aVoid -> {
+                                //U.toast(context, "firestore ok");
+                                stopPd();
+                                startActivity(new Intent(context, MainActivity.class));
+                                finish();
+                            }))
+                            .addOnFailureListener(e -> {
+                                stopPd();
+                                U.toast(context, "firestore fail" + e.getMessage());
+                            });
                 }
-
+            } else {
+                //실패
+                U.toast(LoginActivity.this, "익명계정 생성 실패.");
+                stopPd();
             }
-        });
+        }));
+    }
 
-    } //익명가입 / 로그인
 
+    //이메일 로그인
     public void onLogin() {
 
         if (!isVaild()) {
@@ -218,29 +182,27 @@ public class LoginActivity extends Activity implements GoogleApiClient.OnConnect
         showPd();
         String email = binding.id.getText().toString();
         String password = binding.pw.getText().toString();
-        firebaseAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-            @Override
-            public void onComplete(@NonNull Task<AuthResult> task) {
-                if (task.isSuccessful()) {
-                    FirebaseUser user = getUser();
-                    //연결이 성공되었으니, 허가된 서버로 이동
-                    U.log("로그인완료");
-                    U.log(user.getUid());
-                    U.log(user.getEmail());
-                    U.toast(LoginActivity.this, "이메일로그인 성공.");
-                    startActivity(new Intent(context, MainActivity.class));
-                    finish();
+        firebaseAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener((task -> {
+            if (task.isSuccessful()) {
+                FirebaseUser user = getUser();
+                //연결이 성공되었으니, 허가된 서버로 이동
+                U.log("로그인완료");
+                U.log(user.getUid());
+                U.log(user.getEmail());
+                U.toast(LoginActivity.this, "이메일로그인 성공.");
+                startActivity(new Intent(context, MainActivity.class));
+                finish();
 
-                } else {
-                    //실패 사유 보여주기
-                    U.toast(LoginActivity.this, "이메일로그인 실패.\n" + task.getException().getMessage());
-                }
-                stopPd();
+            } else {
+                //실패 사유 보여주기
+                U.toast(LoginActivity.this, "이메일로그인 실패.\n" + task.getException().getMessage());
             }
-        });
-    } //이메일 로그인
+            stopPd();
+        }));
+    }
 
 
+    //공백 검증
     public boolean isVaild() {
         String email = binding.id.getText().toString();
         String password = binding.pw.getText().toString();
@@ -256,12 +218,6 @@ public class LoginActivity extends Activity implements GoogleApiClient.OnConnect
 
         return true;
     }
-
-    // =============================================================================================
-    // google
-    private static final int RC_SIGN_IN = 9001; // 구글 로그인 요청코드 (값은 변경 가능함)
-    private FirebaseAuth mAuth;                 // fb 인증 객체
-    private GoogleApiClient mGoogleApiClient;   // 구글 로그인 담당 객체(Api 담당 객체)
 
     // google
     // 초기화
@@ -281,6 +237,7 @@ public class LoginActivity extends Activity implements GoogleApiClient.OnConnect
 
     }
 
+
     // google
     public void onGoogleLogin() {
         signIn();
@@ -288,7 +245,7 @@ public class LoginActivity extends Activity implements GoogleApiClient.OnConnect
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-        U.log( "연결 실패 => 재시도 같은 시나리오 필요:" + connectionResult);
+        U.log("연결 실패 => 재시도 같은 시나리오 필요:" + connectionResult);
     }
 
     // google
@@ -304,133 +261,104 @@ public class LoginActivity extends Activity implements GoogleApiClient.OnConnect
     private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
         U.log("firebaseAuthWithGoogle:" + acct.getId());
         AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
+
         mAuth.signInWithCredential(credential)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            // Sign in success, update UI with the signed-in user's information
-                            FirebaseUser user = mAuth.getCurrentUser();
-                            U.log("" + user.getDisplayName());
-                            U.log( "" + user.getEmail());
-                            U.log("" + user.getUid());
-                            U.log( "" + user.getPhotoUrl().toString());
+                .addOnCompleteListener(this, (task -> {
+                    if (task.isSuccessful()) {
+                        // Sign in success, update UI with the signed-in user's information
+                        FirebaseUser user = mAuth.getCurrentUser();
+                        U.log("" + user.getDisplayName());
+                        U.log("" + user.getEmail());
+                        U.log("" + user.getUid());
+                        U.log("" + user.getPhotoUrl().toString());
 
-                            User u = new User(user.getUid(), null, user.getEmail(), user.getDisplayName());
+                        User u = new User(user.getUid(), null, user.getEmail(), user.getDisplayName());
 
-                            //firestore 입력
-                            FirebaseFirestore db = FirebaseFirestore.getInstance();
-                            db.collection("users")
-                                    .document(user.getUid())
-                                    .set(u)
-                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                        @Override
-                                        public void onSuccess(Void aVoid) {
+                        //firestore 입력
+                        FirebaseFirestore db = FirebaseFirestore.getInstance();
+                        db.collection("users")
+                                .document(user.getUid())
+                                .set(u)
+                                .addOnSuccessListener((aVoid -> {
+                                    //U.toast(context, "firestore ok");
+                                    stopPd();
+                                    startActivity(new Intent(context, MainActivity.class));
+                                    finish();
+                                }))
+                                .addOnFailureListener((e -> {
+                                    stopPd();
+                                    U.toast(context, "firestore fail" + e.getMessage());
+                                }));
 
-                                            //U.toast(context, "firestore ok");
-                                            stopPd();
-                                            startActivity(new Intent(context, MainActivity.class));
-                                            finish();
-                                        }
-                                    })
-                                    .addOnFailureListener(new OnFailureListener() {
-                                        @Override
-                                        public void onFailure(@NonNull Exception e) {
-                                            stopPd();
-                                            U.toast(context, "firestore fail" + e.getMessage());
-
-                                        }
-                                    });
-
-                        } else {
-                            // If sign in fails, display a message to the user.
-                            U.toast(context, ""+task.getException().getMessage());
-                            stopPd();
-                        }
-
+                    } else {
+                        // If sign in fails, display a message to the user.
+                        U.toast(context, "" + task.getException().getMessage());
+                        stopPd();
                     }
-                });
+                }));
     }
 
-    //====================================================================================
+
     // facebook
     CallbackManager callbackManager;
-
-
     public void onFaceBookInfoWithAccessToken(final AccessToken token) {
         AuthCredential credential = FacebookAuthProvider.getCredential(token.getToken());
+
         mAuth.signInWithCredential(credential)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (!task.isSuccessful()) {
-                            U.log("signInWithCredential"+task.getException());
-                            U.getInstance().toast(context, ""+task.getException().getMessage());
+                .addOnCompleteListener(this, task -> {
+                    if (!task.isSuccessful()) {
+                        U.log("signInWithCredential" + task.getException());
+                        U.getInstance().toast(context, "" + task.getException().getMessage());
 
-                        } else {
-                            U.log( "파이어베이스 페북 로그인 완료 => 개인정보 획득");
-                            if (Profile.getCurrentProfile() != null) {
-                                Log.i("TTT", " " + Profile.getCurrentProfile().getName());
-                                Log.i("TTT", " " + Profile.getCurrentProfile().getLinkUri());
-                                Log.i("TTT", " " + Profile.getCurrentProfile().getProfilePictureUri(100, 100));
-                                Log.i("TTT", " " + Profile.getCurrentProfile().getId());
-
-                            }
-
-                            //개인정보 획득을위한 요청을 만듬
-                            GraphRequest request = GraphRequest.newMeRequest(token, new GraphRequest.GraphJSONObjectCallback() {
-                                @Override
-                                public void onCompleted(JSONObject object, GraphResponse response) {
-                                    try {
-                                        U.log( " " + object.getString("email"));
-                                        U.log(" " + object.getString("id"));
-                                        U.log(" " + object.getString("name"));
-                                        String email = object.getString("email");
-                                        String name = object.getString("name");
-                                        FirebaseUser user = mAuth.getCurrentUser();
-                                        User u = new User(user.getUid(), null, email, name);
-
-                                        //firestore 입력
-                                        FirebaseFirestore db = FirebaseFirestore.getInstance();
-                                        db.collection("users")
-                                                .document(user.getUid())
-                                                .set(u)
-                                                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                    @Override
-                                                    public void onSuccess(Void aVoid) {
-
-                                                        U.toast(context, "firestone ok");
-                                                        stopPd();
-                                                        startActivity(new Intent(context, MainActivity.class));
-                                                        finish();
-                                                    }
-                                                })
-                                                .addOnFailureListener(new OnFailureListener() {
-                                                    @Override
-                                                    public void onFailure(@NonNull Exception e) {
-                                                        stopPd();
-                                                        U.toast(context, "firestone fail" + e.getMessage());
-
-                                                    }
-                                                });
-
-
-                                    } catch (JSONException e) {
-                                        e.printStackTrace();
-                                        stopPd();
-                                    }
-                                    U.log( "" + object.toString());
-
-                                }
-                            });
-
-                            Bundle param = new Bundle();
-                            param.putString("fields", "email,id,name");
-                            //요청 수행
-                            request.setParameters(param);
-                            request.executeAsync();
+                    } else {
+                        U.log("파이어베이스 페북 로그인 완료 => 개인정보 획득");
+                        if (Profile.getCurrentProfile() != null) {
+                            U.log(" " + Profile.getCurrentProfile().getName());
+                            U.log(" " + Profile.getCurrentProfile().getLinkUri());
+                            U.log(" " + Profile.getCurrentProfile().getProfilePictureUri(100, 100));
+                            U.log(" " + Profile.getCurrentProfile().getId());
                         }
 
+                        //개인정보 획득을위한 요청을 만듬
+                        GraphRequest request = GraphRequest.newMeRequest(token, (object, response) -> {
+                            try {
+                                U.log(" " + object.getString("email"));
+                                U.log(" " + object.getString("id"));
+                                U.log(" " + object.getString("name"));
+                                String email = object.getString("email");
+                                String name = object.getString("name");
+                                FirebaseUser user = mAuth.getCurrentUser();
+                                User u = new User(user.getUid(), null, email, name);
+
+                                //firestore 입력
+                                FirebaseFirestore db = FirebaseFirestore.getInstance();
+                                db.collection("users")
+                                        .document(user.getUid())
+                                        .set(u)
+                                        .addOnSuccessListener(aVoid -> {
+                                                    //U.toast(context, "firestore ok");
+                                                    stopPd();
+                                                    startActivity(new Intent(context, MainActivity.class));
+                                                    finish();
+                                                }
+                                        )
+                                        .addOnFailureListener(e -> {
+                                                    stopPd();
+                                                    U.toast(context, "firestone fail" + e.getMessage());
+                                                }
+                                        );
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                                stopPd();
+                            }
+                            U.log("" + object.toString());
+                        });
+
+                        Bundle param = new Bundle();
+                        param.putString("fields", "email,id,name");
+                        //요청 수행
+                        request.setParameters(param);
+                        request.executeAsync();
                     }
                 });
     }
@@ -446,8 +374,8 @@ public class LoginActivity extends Activity implements GoogleApiClient.OnConnect
         if (user != null) {
             U.log("" + user.getDisplayName());
             U.log("" + user.getEmail());
-            U.log( "" + user.getUid());
-            U.log( "" + user.getPhotoUrl().toString());
+            U.log("" + user.getUid());
+            U.log("" + user.getPhotoUrl().toString());
             startActivity(new Intent(context, MainActivity.class));
             finish();
         }
