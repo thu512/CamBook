@@ -5,11 +5,10 @@ import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.view.View;
-import android.widget.Toast;
 
 import com.mustdo.cambook.R;
 import com.mustdo.cambook.SuperActivity.Activity;
+import com.mustdo.cambook.Util.U;
 import com.mustdo.cambook.databinding.ActivityMainBinding;
 
 public class MainActivity extends Activity {
@@ -20,12 +19,7 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         binding= DataBindingUtil.setContentView(this, R.layout.activity_main);
 
-        binding.btn5.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivity(new Intent(getApplicationContext(),AccountActivity.class));
-            }
-        });
+        binding.btn5.setOnClickListener(view -> startActivity(new Intent(getApplicationContext(),AccountActivity.class)));
 
     }
 
@@ -40,7 +34,7 @@ public class MainActivity extends Activity {
             isFirstEnd=true;
             //3초후에 초기화된다.(최초로 한번 백키를 눌렀던 상황이)
             handler.sendEmptyMessageDelayed(1,3000);
-            Toast.makeText(this,"뒤로가기를 한번 더 누르시면 종료됩니다.",Toast.LENGTH_LONG).show();
+            U.getInstance().toast(this, "뒤로가기를 한번 더 누르시면 종료됩니다.");
         }else{
             super.onBackPressed();
         }

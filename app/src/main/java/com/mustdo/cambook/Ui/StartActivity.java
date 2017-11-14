@@ -16,8 +16,6 @@ import com.mustdo.cambook.Util.U;
 import java.util.ArrayList;
 import java.util.List;
 
-import cn.pedant.SweetAlert.SweetAlertDialog;
-
 public class StartActivity extends Activity {
     FirebaseAuth user;
     private String[] permissions = {android.Manifest.permission.READ_EXTERNAL_STORAGE, android.Manifest.permission.WRITE_EXTERNAL_STORAGE, android.Manifest.permission.CAMERA};
@@ -122,12 +120,7 @@ public class StartActivity extends Activity {
                 "알림",
                 "권한사용을 동의해주셔야 이용이 가능합니다.",
                 "확인",
-                new SweetAlertDialog.OnSweetClickListener(){
-                    @Override
-                    public void onClick(SweetAlertDialog sweetAlertDialog) {
-                        finish();
-                    }
-                },
+                sweetAlertDialog -> finish(),
                 null,
                 null
         );

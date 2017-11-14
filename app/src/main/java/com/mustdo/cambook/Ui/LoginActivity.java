@@ -145,7 +145,7 @@ public class LoginActivity extends Activity implements GoogleApiClient.OnConnect
                 if (user != null) {
                     U.log(user.getUid());
                     U.log("" + user.isAnonymous());
-                    U.toast(LoginActivity.this, "익명계정 생성 성공.");
+                    //U.toast(LoginActivity.this, "익명계정 생성 성공.");
                     User u = new User(user.getUid(), null, null, null);
 
                     //firestore 입력
@@ -189,7 +189,7 @@ public class LoginActivity extends Activity implements GoogleApiClient.OnConnect
                 U.log("로그인완료");
                 U.log(user.getUid());
                 U.log(user.getEmail());
-                U.toast(LoginActivity.this, "이메일로그인 성공.");
+                //U.toast(LoginActivity.this, "이메일로그인 성공.");
                 startActivity(new Intent(context, MainActivity.class));
                 finish();
 

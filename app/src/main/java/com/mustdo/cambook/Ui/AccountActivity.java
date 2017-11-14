@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.util.Log;
 import android.view.View;
 
 import com.facebook.login.LoginManager;
@@ -12,11 +11,10 @@ import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.common.api.Status;
 import com.google.firebase.auth.FirebaseAuth;
 import com.mustdo.cambook.R;
 import com.mustdo.cambook.SuperActivity.Activity;
+import com.mustdo.cambook.Util.U;
 import com.mustdo.cambook.databinding.ActivityAccountBinding;
 
 
@@ -32,48 +30,35 @@ public class AccountActivity extends Activity implements GoogleApiClient.OnConne
         initGoogleLoginInit();
 
 
-
         firebaseAuth = FirebaseAuth.getInstance();
-        if(firebaseAuth.getCurrentUser().isAnonymous()){
+        if (firebaseAuth.getCurrentUser().isAnonymous()) {
             binding.email.setVisibility(View.VISIBLE);
-            binding.idbox.setText(""+firebaseAuth.getCurrentUser().getUid());
-        }else{
-            binding.idbox.setText(""+firebaseAuth.getCurrentUser().getEmail());
+            binding.idbox.setText("" + firebaseAuth.getCurrentUser().getUid());
+        } else {
+            binding.idbox.setText("" + firebaseAuth.getCurrentUser().getEmail());
         }
 
 
-
-        binding.email.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(getApplicationContext(),JoinActivity.class);
-                intent.putExtra("Anony",true);
-                startActivity(intent);
-            }
-        });
+        binding.email.setOnClickListener(view -> {
+                    Intent intent = new Intent(getApplicationContext(), JoinActivity.class);
+                    intent.putExtra("Anony", true);
+                    startActivity(intent);
+                }
+        );
 
 
-
-
-        binding.logout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                //페북 로그아웃
-                LoginManager.getInstance().logOut();
-                Auth.GoogleSignInApi.signOut(mGoogleApiClient).setResultCallback(
-                        new ResultCallback<Status>() {
-                            @Override
-                            public void onResult(@NonNull Status status) {
-                                Log.i("T", "구글 로그 아웃");
-                            }
-                        });
-                signOut();
-                Intent intent = new Intent(getApplicationContext(),LoginActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intent);
-                finish();
-            }
-        });
+        binding.logout.setOnClickListener(view -> {
+                    //페북 로그아웃
+                    LoginManager.getInstance().logOut();
+                    Auth.GoogleSignInApi.signOut(mGoogleApiClient).setResultCallback(
+                            status -> U.getInstance().log("구글 로그 아웃"));
+                    signOut();
+                    Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent);
+                    finish();
+                }
+        );
     }
 
     private GoogleApiClient mGoogleApiClient;   // 구글 로그인 담당 객체(Api 담당 객체)
