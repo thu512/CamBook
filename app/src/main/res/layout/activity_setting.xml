@@ -147,7 +147,7 @@
                 android:layout_marginStart="12dp"
                 android:layout_toEndOf="@+id/textView10"
                 android:layout_toRightOf="@+id/textView10"
-                android:textSize="8.5sp" />
+                android:textSize="10sp" />
 
             <TextView
                 android:id="@+id/appVersion"
