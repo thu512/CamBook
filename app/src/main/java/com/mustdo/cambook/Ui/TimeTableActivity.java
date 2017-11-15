@@ -13,6 +13,8 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 import com.mustdo.cambook.Model.Subject;
 import com.mustdo.cambook.R;
 import com.mustdo.cambook.SuperActivity.Activity;
@@ -20,6 +22,7 @@ import com.mustdo.cambook.Util.U;
 import com.mustdo.cambook.databinding.ActivityTimeTableBinding;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class TimeTableActivity extends Activity {
@@ -30,6 +33,7 @@ public class TimeTableActivity extends Activity {
     private FirebaseFirestore db;
     private FirebaseAuth firebaseAuth;
     private FirebaseUser user;
+    private FirebaseStorage firebaseStorage;
 
     private TextView s1[] = new TextView[12]; //월
     private TextView s2[] = new TextView[12]; //화
@@ -45,6 +49,7 @@ public class TimeTableActivity extends Activity {
         db = FirebaseFirestore.getInstance();
         firebaseAuth = FirebaseAuth.getInstance();
         user = firebaseAuth.getCurrentUser();
+        firebaseStorage = FirebaseStorage.getInstance();
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_time_table);
 
@@ -148,9 +153,10 @@ public class TimeTableActivity extends Activity {
                         Subject sub = doc.toObject(Subject.class);
                         U.getInstance().log("" + sub.toString());
 
-                        //최초 실행인경우 기존 시간표 불러와서 리스트 생성
+                        //최초 실행인경우 기존 시간표 불러와서 리스트 생성 -> Firestorage에서 사진 가져오기.
                         if (!U.getInstance().getBoolean(this, "setList")) {
                             makeList(sub.getSubject());
+                            downLoadPhoto(sub.getSubject());
                         }
                         //firestore에서 꺼내와서 화면에 셋팅
                         drawTable(sub.getItem(), sub.getS_time(), sub.getE_time(), sub.getSubject(), sub.getColor());
@@ -242,7 +248,22 @@ public class TimeTableActivity extends Activity {
         }
     }
 
+    //firestorage에서 사진 불러오기
+    public void downLoadPhoto(String subject){
+        StorageReference storageRef = firebaseStorage.getReferenceFromUrl("gs://cambook-31402.appspot.com/");
 
+
+        File localFile = null;
+        try {
+            localFile = File.createTempFile("images", "jpg");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        StorageReference userSubjectRef = storageRef.child(user.getUid()).child(subject);
+        userSubjectRef.getFile(localFile).addOnSuccessListener(taskSnapshot -> {
+
+        });
+    }
 
     //중복확인
     public boolean checkDuplication(String week, String stime, String etime) {

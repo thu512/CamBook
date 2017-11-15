@@ -24,7 +24,36 @@ public class SettingActivity extends AppCompatActivity {
 
 
         binding.back.setOnClickListener(view -> finish());
+        //스위치 -> Sp연동
+        if(U.getInstance().getBoolean(this,"autosave")){
+            binding.autoSaveSwt.setChecked(true);
+        }else{
+            binding.autoSaveSwt.setChecked(false);
+        }
+        if(U.getInstance().getBoolean(this,"startphoto")){
+            binding.luchSetSwt.setChecked(true);
+        }else{
+            binding.luchSetSwt.setChecked(false);
+        }
 
+
+        binding.luchSetSwt.setOnCheckedChangeListener((compoundButton, b) -> {
+            if (b) {
+                U.getInstance().setBoolean(this, "startphoto", true);
+                binding.luchSetSwt.setChecked(true);
+            } else {
+                U.getInstance().setBoolean(this, "startphoto", false);
+                binding.luchSetSwt.setChecked(false);
+            }
+        });
+
+
+        binding.autoSaveSwt.setOnClickListener(view -> {
+            U.getInstance().showPopup1(this,"죄송합니다.","추후 업데이트 될 예정입니다.","확인",
+                    sweetAlertDialog -> sweetAlertDialog.dismissWithAnimation());
+
+        });
+        binding.autoSaveSwt.setChecked(true);
 
     }
 
@@ -67,7 +96,7 @@ public class SettingActivity extends AppCompatActivity {
 
                     }
                 }
-        ).addOnFailureListener(e -> U.getInstance().toast(getApplicationContext(),""+e.getMessage()));
+        ).addOnFailureListener(e -> U.getInstance().toast(getApplicationContext(), "" + e.getMessage()));
     }
 
 

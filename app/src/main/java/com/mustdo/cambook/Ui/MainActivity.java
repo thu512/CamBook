@@ -44,7 +44,16 @@ public class MainActivity extends Activity {
         db = FirebaseFirestore.getInstance();
         firebaseStorage = FirebaseStorage.getInstance();
 
+        //앱설치후 처음 실행 시 무조건 시간표 액티비티로 이동 -> 과목 리스트, 디렉터리, 사진동기화 작업 필요.
+        if(!U.getInstance().getBoolean(this,"first")){
+            U.getInstance().setBoolean(this,"first",true);
+            startActivity(new Intent(getApplicationContext(), TimeTableActivity.class));
+        }
 
+        //사진촬영으로 바로 이동
+        if(U.getInstance().getBoolean(this,"startphoto")){
+            launchCamera();
+        }
         //계정설정
         binding.btn5.setOnClickListener(view -> startActivity(new Intent(getApplicationContext(), AccountActivity.class)));
 

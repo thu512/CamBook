@@ -33,8 +33,7 @@ public class StartActivity extends Activity {
             @Override
             public void run() {
                 if(!U.getInstance().getBoolean(StartActivity.this,"first")){
-                    U.getInstance().setBoolean(StartActivity.this,"first",true);
-                    U.getInstance().setBoolean(StartActivity.this,"autosave",false);
+                    U.getInstance().setBoolean(StartActivity.this,"autosave",true);
                     U.getInstance().setBoolean(StartActivity.this,"startphoto",false);
 
                 }
