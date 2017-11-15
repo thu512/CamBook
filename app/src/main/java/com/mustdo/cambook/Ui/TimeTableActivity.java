@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Environment;
 import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -18,6 +19,7 @@ import com.mustdo.cambook.SuperActivity.Activity;
 import com.mustdo.cambook.Util.U;
 import com.mustdo.cambook.databinding.ActivityTimeTableBinding;
 
+import java.io.File;
 import java.util.ArrayList;
 
 public class TimeTableActivity extends Activity {
@@ -221,8 +223,26 @@ public class TimeTableActivity extends Activity {
             }
         }
         subs.add(subject);
+        //사진 저장용 디렉토리 생성
+        mkDir(subject);
         U.getInstance().saveSharedPreferences_Data(this, "subject", subs);
     }
+
+    //디렉생성
+    public void mkDir(String sub){
+        //외부 저장소에 이 앱을 통해 촬영된 사진만 저장할 directory 경로와 File을 연결
+
+        File mediaStorageDir = new File(this.getExternalFilesDir(Environment.DIRECTORY_DCIM),sub);
+        if(!mediaStorageDir.exists()){ // 해당 directory가 아직 생성되지 않았을 경우 mkdirs(). 즉 directory를 생성한다.
+            if(!mediaStorageDir.mkdir()){// 만약 mkdirs()가 제대로 동작하지 않을 경우, 오류 Log를 출력한 뒤, 해당 method 종료
+                U.getInstance().log("failed to create directory");
+                return;
+            }
+            U.getInstance().log("create directory");
+        }
+    }
+
+
 
     //중복확인
     public boolean checkDuplication(String week, String stime, String etime) {

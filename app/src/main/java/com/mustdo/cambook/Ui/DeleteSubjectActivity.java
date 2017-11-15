@@ -3,6 +3,7 @@ package com.mustdo.cambook.Ui;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
+import android.os.Environment;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -18,6 +19,7 @@ import com.mustdo.cambook.SuperActivity.Activity;
 import com.mustdo.cambook.Util.U;
 import com.mustdo.cambook.databinding.ActivityDeleteSubjectBinding;
 
+import java.io.File;
 import java.util.ArrayList;
 
 import static com.mustdo.cambook.Ui.TimeTableActivity.DELETE_CODE;
@@ -81,6 +83,7 @@ public class DeleteSubjectActivity extends Activity {
                     //firestore 에서 과목 삭제 / sp에서 과목 삭제
                     deleteSp(select);
                     deleteFirestore(select);
+                    rmDir(select);
                 }
         );
     }
@@ -145,5 +148,21 @@ public class DeleteSubjectActivity extends Activity {
             }
         }
         U.getInstance().saveSharedPreferences_Data(this, "subject", subs);
+    }
+
+    //디렉제거
+    public void rmDir(String sub){
+        //외부 저장소에 이 앱을 통해 촬영된 사진만 저장할 directory 경로와 File을 연결
+
+        File mediaStorageDir = new File(this.getExternalFilesDir(Environment.DIRECTORY_DCIM),sub);
+
+        File[] childFileList = mediaStorageDir.listFiles();
+
+        for(File childFile : childFileList)
+        {
+            childFile.delete();    //하위 파일
+        }
+        mediaStorageDir.delete();    //root 삭제
+
     }
 }
