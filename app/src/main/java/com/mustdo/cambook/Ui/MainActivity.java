@@ -72,8 +72,9 @@ public class MainActivity extends Activity {
 
     // showImagePicker is boolean value: Default is true
     private void launchCamera() {
-        new SandriosCamera(MainActivity.this, CAPTURE_MEDIA)
-                .setShowPicker(true)
+        new SandriosCamera(this, CAPTURE_MEDIA)
+                .setShowPicker(false)
+                .setMediaAction(CameraConfiguration.MEDIA_ACTION_BOTH)
                 .enableImageCropping(true) // Default is false.
                 .launchCamera();
     }

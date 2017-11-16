@@ -12,6 +12,10 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.mustdo.cambook.Model.User;
 import com.mustdo.cambook.R;
 import com.mustdo.cambook.SuperActivity.Activity;
 import com.mustdo.cambook.Util.U;
@@ -22,6 +26,8 @@ public class AccountActivity extends Activity implements GoogleApiClient.OnConne
 
     ActivityAccountBinding binding;
     FirebaseAuth firebaseAuth;
+    FirebaseFirestore db;
+    FirebaseUser user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,13 +35,22 @@ public class AccountActivity extends Activity implements GoogleApiClient.OnConne
         binding = DataBindingUtil.setContentView(this, R.layout.activity_account);
         initGoogleLoginInit();
 
-
+        db = FirebaseFirestore.getInstance();
         firebaseAuth = FirebaseAuth.getInstance();
-        if (firebaseAuth.getCurrentUser().isAnonymous()) {
+        user = firebaseAuth.getCurrentUser();
+
+        if (user.isAnonymous()) {
             binding.email.setVisibility(View.VISIBLE);
-            binding.idbox.setText("" + firebaseAuth.getCurrentUser().getUid());
+            binding.idbox.setText("비회원 입니다.");
         } else {
-            binding.idbox.setText("" + firebaseAuth.getCurrentUser().getEmail());
+            DocumentReference userRef = db.collection("users").document(user.getUid());
+            userRef.get().addOnSuccessListener(documentSnapshots -> {
+                User user = documentSnapshots.toObject(User.class);
+                binding.idbox.setText("" + user.getName());
+            }).addOnFailureListener(e -> {
+                U.getInstance().toast(AccountActivity.this, "" + e.getMessage());
+            });
+
         }
 
 
@@ -48,19 +63,33 @@ public class AccountActivity extends Activity implements GoogleApiClient.OnConne
 
 
         binding.logout.setOnClickListener(view -> {
-                    //페북 로그아웃
-                    LoginManager.getInstance().logOut();
-                    Auth.GoogleSignInApi.signOut(mGoogleApiClient).setResultCallback(
-                            status -> U.getInstance().log("구글 로그 아웃"));
-                    signOut();
-                    Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                    startActivity(intent);
-                    finish();
-                }
-        );
+
+
+            if(user.isAnonymous()){
+                U.getInstance().showPopup3(AccountActivity.this,
+                        "경고", "비회원 로그아웃 시 데이터가 사라집니다.",
+                        "확인",(sweetAlertDialog -> {
+                            sweetAlertDialog.dismissWithAnimation();
+                            logOut();
+                        }),
+                        "취소", sweetAlertDialog -> sweetAlertDialog.dismissWithAnimation());
+            }else {
+                logOut();
+            }
+
+        });
     }
 
+    public void logOut(){
+        LoginManager.getInstance().logOut();
+        Auth.GoogleSignInApi.signOut(mGoogleApiClient).setResultCallback(
+                status -> U.getInstance().log("구글 로그 아웃"));
+        signOut();
+        Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+        finish();
+    }
     private GoogleApiClient mGoogleApiClient;   // 구글 로그인 담당 객체(Api 담당 객체)
 
     // google
@@ -84,4 +113,6 @@ public class AccountActivity extends Activity implements GoogleApiClient.OnConne
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
 
     }
+
+
 }

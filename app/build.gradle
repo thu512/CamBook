@@ -12,7 +12,7 @@ android {
     }
     buildTypes {
         release {
-            minifyEnabled true
+            minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
@@ -50,5 +50,6 @@ dependencies {
     compile 'com.werb.pickphotoview:pickphotoview:0.3.0'
     implementation 'com.github.f0ris.sweetalert:library:1.5.2'
     compile 'com.sandrios.android:sandriosCamera:1.0.9'
+
 }
 apply plugin: 'com.google.gms.google-services'

@@ -18,10 +18,10 @@
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
-            android:layout_marginTop="80dp"
+            android:layout_marginTop="110dp"
             android:text="@string/logo"
             android:textColor="#5185C7"
-            android:textSize="40sp" />
+            android:textSize="43sp" />
 
         <Button
             android:id="@+id/btn1"
@@ -77,8 +77,8 @@
 
         <Button
             android:id="@+id/btn5"
-            android:layout_width="35dp"
-            android:layout_height="35dp"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
             android:layout_alignParentTop="true"
