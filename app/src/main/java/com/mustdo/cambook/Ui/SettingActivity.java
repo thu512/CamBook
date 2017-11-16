@@ -47,13 +47,20 @@ public class SettingActivity extends AppCompatActivity {
             }
         });
 
-
-        binding.autoSaveSwt.setOnClickListener(view -> {
-            U.getInstance().showPopup1(this,"죄송합니다.","추후 업데이트 될 예정입니다.","확인",
-                    sweetAlertDialog -> sweetAlertDialog.dismissWithAnimation());
-
-        });
         binding.autoSaveSwt.setChecked(true);
+        binding.autoSaveSwt.setOnClickListener(view -> {
+            U.getInstance().showPopup1(this,"죄송합니다.","추후 업데이트 될 예정입니다.\n\n현재 자동저장 실행 중 입니다.","확인",
+                    sweetAlertDialog -> sweetAlertDialog.dismissWithAnimation());
+            binding.autoSaveSwt.setChecked(true);
+        });
+
+        binding.getphoto.setOnClickListener(view -> {
+            U.getInstance().showPopup2(this,"알림","로그아웃 하신 후\n다시 로그인 하시면 자동으로 \n데이터가 복구 됩니다.",
+                    "확인",sweetAlertDialog -> sweetAlertDialog.dismissWithAnimation());
+        });
+
+
+
 
     }
 

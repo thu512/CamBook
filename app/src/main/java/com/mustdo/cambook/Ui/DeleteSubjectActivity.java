@@ -13,6 +13,8 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 import com.mustdo.cambook.Model.Subject;
 import com.mustdo.cambook.R;
 import com.mustdo.cambook.SuperActivity.Activity;
@@ -34,7 +36,7 @@ public class DeleteSubjectActivity extends Activity {
     private FirebaseFirestore db;
     private FirebaseAuth firebaseAuth;
     private FirebaseUser user;
-
+    private FirebaseStorage firebaseStorage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,13 +50,13 @@ public class DeleteSubjectActivity extends Activity {
         db = FirebaseFirestore.getInstance();
         firebaseAuth = FirebaseAuth.getInstance();
         user = firebaseAuth.getCurrentUser();
+        firebaseStorage = FirebaseStorage.getInstance();
 
         //과목리스트 받아오기
         subject = U.getInstance().loadSharedPreferencesData(this, "subject");
 
         //지워야될 Firestore 문서id를 담을 배열
         deleteList = new ArrayList<>();
-
 
 
         adapter = new ArrayAdapter<String>(this, R.layout.spinner_item);
@@ -69,23 +71,26 @@ public class DeleteSubjectActivity extends Activity {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 select = parent.getSelectedItem().toString();
             }
+
             @Override
-            public void onNothingSelected(AdapterView<?> parent) {}
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
         });
 
 
         //완료 버튼 클릭
         binding.button.setOnClickListener(view -> {
-                    if (select.equals("과목 선택")) {
-                        U.getInstance().toast(DeleteSubjectActivity.this, "삭제할 과목을 선택해주세요.");
-                        return;
-                    }
-                    //firestore 에서 과목 삭제 / sp에서 과목 삭제
-                    deleteSp(select);
-                    deleteFirestore(select);
-                    rmDir(select);
-                }
-        );
+            if (select.equals("과목 선택")) {
+                U.getInstance().toast(DeleteSubjectActivity.this, "삭제할 과목을 선택해주세요.");
+                return;
+            }
+            //firestore 에서 과목 삭제 / sp에서 과목 삭제
+            deleteSp(select);
+            deletePhoto(select);
+            deletePhotoUrl(user.getUid(), select);
+            deleteFirestore(select);
+            rmDir(select);
+        });
     }
 
 
@@ -135,8 +140,43 @@ public class DeleteSubjectActivity extends Activity {
             //삭제 실패
             U.getInstance().toast(getApplicationContext(), "" + e.getMessage());
         });
+
+
     }
 
+    public void deletePhotoUrl(String uid, String subject) {
+        CollectionReference colRef = db.collection("photos")
+                .document(user.getUid())
+                .collection(subject);
+        colRef.get().addOnSuccessListener(documentSnapshots -> {
+            for (DocumentSnapshot doc : documentSnapshots.getDocuments()) {
+                db.collection("photos")
+                        .document(user.getUid())
+                        .collection(subject)
+                        .document(doc.getId())
+                        .delete().addOnSuccessListener(aVoid -> {
+                    //삭제 성공
+                }).addOnFailureListener(e -> {
+                    //삭제 실패
+                    U.getInstance().toast(getApplicationContext(), "" + e.getMessage());
+                });
+            }
+        });
+    }
+
+    public void deletePhoto(String subject){
+        StorageReference storageRef = firebaseStorage.getReference();
+
+
+        StorageReference desertRef = storageRef.child(user.getUid()).child(subject);
+
+
+        desertRef.delete().addOnSuccessListener(aVoid -> {
+            U.getInstance().toast(this,subject+" 모든 사진이 삭제되었습니다.");
+        }).addOnFailureListener(e -> {
+            U.getInstance().log(""+e.getMessage());
+        });
+    }
 
     //sp에서 과목 삭제
     public void deleteSp(String subject) {
@@ -151,15 +191,14 @@ public class DeleteSubjectActivity extends Activity {
     }
 
     //디렉제거
-    public void rmDir(String sub){
+    public void rmDir(String sub) {
         //외부 저장소에 이 앱을 통해 촬영된 사진만 저장할 directory 경로와 File을 연결
 
-        File mediaStorageDir = new File(this.getExternalFilesDir(Environment.DIRECTORY_DCIM),sub);
+        File mediaStorageDir = new File(this.getExternalFilesDir(Environment.DIRECTORY_DCIM), sub);
 
         File[] childFileList = mediaStorageDir.listFiles();
 
-        for(File childFile : childFileList)
-        {
+        for (File childFile : childFileList) {
             childFile.delete();    //하위 파일
         }
         mediaStorageDir.delete();    //root 삭제

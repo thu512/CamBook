@@ -18,10 +18,18 @@
         android:icon="@drawable/ic_school_black_24dp"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/Theme.AppCompat.NoActionBar"
+        android:theme="@style/Theme.Design.Light.NoActionBar"
         tools:replace="cdandroid:icon,android:allowBackup">
 
-
+        <provider
+            android:name="com.werb.pickphotoview.provider.PickProvider"
+            android:authorities="${applicationId}.provider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths"/>
+        </provider>
 
         <activity android:name=".Ui.StartActivity">
             <intent-filter>
@@ -62,7 +70,6 @@
         <activity android:name=".Ui.AddSubjectActivity" />
         <activity android:name=".Ui.DeleteSubjectActivity" />
         <activity android:name=".Ui.SettingActivity" />
-        <activity android:name=".Ui.CameraActivity"></activity>
     </application>
 
 </manifest>

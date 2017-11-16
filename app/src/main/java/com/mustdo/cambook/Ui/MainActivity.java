@@ -24,8 +24,11 @@ import com.mustdo.cambook.Util.U;
 import com.mustdo.cambook.databinding.ActivityMainBinding;
 import com.sandrios.sandriosCamera.internal.SandriosCamera;
 import com.sandrios.sandriosCamera.internal.configuration.CameraConfiguration;
+import com.werb.pickphotoview.PickPhotoView;
+import com.werb.pickphotoview.util.PickConfig;
 
 import java.io.File;
+import java.util.ArrayList;
 
 public class MainActivity extends Activity {
     ActivityMainBinding binding;
@@ -63,6 +66,20 @@ public class MainActivity extends Activity {
             launchCamera();
         });
 
+        //앨범
+        binding.btn2.setOnClickListener(view -> {
+            new PickPhotoView.Builder(MainActivity.this)
+                    .setPickPhotoSize(1)                  // select image size
+                    .setClickSelectable(true)             // click one image immediately close and return image
+                    .setShowCamera(true)                  // is show camera
+                    .setSpanCount(3)                      // span count
+                    .setLightStatusBar(true)              // lightStatusBar used in Android M or higher
+                    .setStatusBarColor("#ffffff")     // statusBar color
+                    .setToolbarColor("#ffffff")       // toolbar color
+                    .setSelectIconColor("#5185C7")     // select icon color
+                    .start();
+        });
+
         //시간표
         binding.btn3.setOnClickListener(view -> startActivity(new Intent(getApplicationContext(), TimeTableActivity.class)));
 
@@ -84,6 +101,8 @@ public class MainActivity extends Activity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
+
+        //카메라
         if (requestCode == CAPTURE_MEDIA && resultCode == RESULT_OK) {
             String filePath = data.getStringExtra(CameraConfiguration.Arguments.FILE_PATH);
             String[] path = filePath.split("/");
@@ -106,8 +125,19 @@ public class MainActivity extends Activity {
 
             //과목명 유추 및 사진 해당 과목 디렉에 저장 및 firebaseStorage업로드
             getSubjectSave(filePath, fileName, day, time);
+        }
 
 
+        //앨범
+        if(resultCode == 0){
+            return;
+        }
+        if(data == null){
+            return;
+        }
+        if (requestCode == PickConfig.PICK_PHOTO_DATA) {
+            ArrayList<String> selectPaths = (ArrayList<String>) data.getSerializableExtra(PickConfig.INTENT_IMG_LIST_SELECT);
+            // do something u want
         }
     }
 

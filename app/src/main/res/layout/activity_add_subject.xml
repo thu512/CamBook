@@ -49,7 +49,7 @@
             android:layout_alignLeft="@+id/relativeLayout6"
             android:layout_alignStart="@+id/relativeLayout6"
             android:layout_below="@+id/constraintLayout"
-            android:layout_marginTop="35dp"
+            android:layout_marginTop="24dp"
             android:background="@drawable/spinner_border">
 
             <Spinner
@@ -84,7 +84,7 @@
             android:layout_alignLeft="@+id/relativeLayout5"
             android:layout_alignStart="@+id/relativeLayout5"
             android:layout_below="@+id/relativeLayout4"
-            android:layout_marginTop="40dp"
+            android:layout_marginTop="29dp"
             android:background="@drawable/spinner_border">
 
             <Spinner
@@ -116,7 +116,7 @@
             android:layout_alignLeft="@+id/editText"
             android:layout_alignStart="@+id/editText"
             android:layout_below="@+id/relativeLayout6"
-            android:layout_marginTop="47dp"
+            android:layout_marginTop="33dp"
             android:background="@drawable/spinner_border">
 
             <Spinner
@@ -146,9 +146,10 @@
             android:layout_width="215dp"
             android:layout_height="55dp"
 
-            android:layout_above="@+id/submit"
-            android:layout_centerHorizontal="true"
-            android:layout_marginBottom="63dp"
+            android:layout_alignLeft="@+id/editText"
+            android:layout_alignStart="@+id/editText"
+            android:layout_below="@+id/editText"
+            android:layout_marginTop="36dp"
             android:background="@drawable/spinner_border"
             android:gravity="center"
             android:onClick="onSelectColor"
@@ -171,17 +172,16 @@
             android:id="@+id/editText"
             android:layout_width="215dp"
             android:layout_height="55dp"
-            android:layout_alignLeft="@+id/colorView"
-            android:layout_alignStart="@+id/colorView"
             android:layout_below="@+id/relativeLayout5"
-            android:layout_marginTop="53dp"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="33dp"
             android:layout_span="2"
             android:ems="10"
             android:gravity="center"
             android:hint="과목명을 입력하세요."
             android:inputType="textPersonName"
-            android:textColorHint="#9b9b9b"
-            android:textColor="#000000"/>
+            android:textColor="#000000"
+            android:textColorHint="#9b9b9b" />
 
 
     </RelativeLayout>
