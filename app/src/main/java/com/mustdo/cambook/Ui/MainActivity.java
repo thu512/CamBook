@@ -16,6 +16,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.mustdo.cambook.Model.DownloadUrl;
 import com.mustdo.cambook.Model.Subject;
 import com.mustdo.cambook.R;
 import com.mustdo.cambook.SuperActivity.Activity;
@@ -45,13 +46,13 @@ public class MainActivity extends Activity {
         firebaseStorage = FirebaseStorage.getInstance();
 
         //앱설치후 처음 실행 시 무조건 시간표 액티비티로 이동 -> 과목 리스트, 디렉터리, 사진동기화 작업 필요.
-        if(!U.getInstance().getBoolean(this,"first")){
-            U.getInstance().setBoolean(this,"first",true);
+        if (!U.getInstance().getBoolean(this, "first")) {
+            U.getInstance().setBoolean(this, "first", true);
             startActivity(new Intent(getApplicationContext(), TimeTableActivity.class));
         }
 
         //사진촬영으로 바로 이동
-        if(U.getInstance().getBoolean(this,"startphoto")){
+        if (U.getInstance().getBoolean(this, "startphoto")) {
             launchCamera();
         }
         //계정설정
@@ -74,7 +75,7 @@ public class MainActivity extends Activity {
     private void launchCamera() {
         new SandriosCamera(this, CAPTURE_MEDIA)
                 .setShowPicker(false)
-                .setMediaAction(CameraConfiguration.MEDIA_ACTION_BOTH)
+                .setMediaAction(CameraConfiguration.MEDIA_ACTION_PHOTO)
                 .enableImageCropping(true) // Default is false.
                 .launchCamera();
     }
@@ -122,44 +123,42 @@ public class MainActivity extends Activity {
 
         colRef.get().addOnSuccessListener(documentSnapshots -> {
 
-                    String result = "기타";
+            String result = "기타";
 
-                    for (DocumentSnapshot doc : documentSnapshots.getDocuments()) {
-                        Subject sub = doc.toObject(Subject.class);
-                        U.getInstance().log("" + sub.toString());
-                        boolean f = false;
-                        if (day.equals(sub.getItem())) {
-                            int s_time = Integer.parseInt(sub.getS_time());
-                            int e_time = Integer.parseInt(sub.getE_time());
-                            for (int i = s_time; i <= e_time; i++) {
-                                if (time == i) {
-                                    U.getInstance().log("" + sub.getSubject());
-                                    result = sub.getSubject();
-                                    f = true;
-                                    break;
-                                }
-                            }
-                            if (f) break;
+            for (DocumentSnapshot doc : documentSnapshots.getDocuments()) {
+                Subject sub = doc.toObject(Subject.class);
+                U.getInstance().log("" + sub.toString());
+                boolean f = false;
+                if (day.equals(sub.getItem())) {
+                    int s_time = Integer.parseInt(sub.getS_time());
+                    int e_time = Integer.parseInt(sub.getE_time());
+                    for (int i = s_time; i <= e_time; i++) {
+                        if (time == i) {
+                            U.getInstance().log("" + sub.getSubject());
+                            result = sub.getSubject();
+                            f = true;
+                            break;
                         }
                     }
-
-
-                    // 과목별 사진 저장소 path
-                    File mediaStorageDir = new File(this.getExternalFilesDir(Environment.DIRECTORY_DCIM), result);
-
-                    //사진을 해당 과목 으로 이동
-                    U.getInstance().moveFile(filePath, mediaStorageDir.getPath(), fileName);
-
-                    //firestorage에 저장
-                    uploadStorage(mediaStorageDir.getPath() + "/" + fileName, fileName, result);
-
-                    stopPd();
+                    if (f) break;
                 }
-        )
-                .addOnFailureListener(e -> {
-                    U.getInstance().toast(MainActivity.this, "" + e.getMessage());
-                    stopPd();
-                });
+            }
+
+
+            // 과목별 사진 저장소 path
+            File mediaStorageDir = new File(this.getExternalFilesDir(Environment.DIRECTORY_DCIM), result);
+
+            //사진을 해당 과목 으로 이동
+            U.getInstance().moveFile(filePath, mediaStorageDir.getPath(), fileName);
+
+            //firestorage에 저장
+            uploadStorage( mediaStorageDir.getPath() + "/" + fileName, fileName, result);
+
+            stopPd();
+        }).addOnFailureListener(e -> {
+            U.getInstance().toast(MainActivity.this, "" + e.getMessage());
+            stopPd();
+        });
     }
 
     //firestorage에 저장
@@ -181,11 +180,32 @@ public class MainActivity extends Activity {
         }).addOnFailureListener(e -> {
             U.getInstance().log("" + e.getMessage());
         }).addOnSuccessListener(taskSnapshot -> {
+
+            //여기서firestore에 다운로드 url저장
+            insertFirestore(subject,taskSnapshot.getDownloadUrl().toString(),fileName);
+
             U.getInstance().toast(getApplicationContext(), "업로드 성공");
         });
 
     }
 
+    //firestore 입력
+    public void insertFirestore(String subject, String url, String fileName) {
+        DownloadUrl d = new DownloadUrl(url,fileName);
+
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("photos").document(user.getUid()).collection(subject)
+                .add(d)
+                .addOnSuccessListener(aVoid -> {
+
+                    U.getInstance().toast(getApplicationContext(), "사진이 저장되었습니다.");
+
+                })
+                .addOnFailureListener(e -> {
+
+                    U.getInstance().toast(getApplicationContext(), "" + e.getMessage());
+                });
+    }
 
     //==============================================================================================
     //백키에 대응하는 메소드

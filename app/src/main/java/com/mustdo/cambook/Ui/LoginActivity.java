@@ -66,6 +66,7 @@ public class LoginActivity extends Activity implements GoogleApiClient.OnConnect
 
         firebaseAuth = FirebaseAuth.getInstance();
 
+
         // google
         initGoogleLoginInit();
 

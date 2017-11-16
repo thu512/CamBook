@@ -15,6 +15,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.mustdo.cambook.Model.DownloadUrl;
 import com.mustdo.cambook.Model.Subject;
 import com.mustdo.cambook.R;
 import com.mustdo.cambook.SuperActivity.Activity;
@@ -85,7 +86,7 @@ public class TimeTableActivity extends Activity {
         //과목 추가됨
         if (requestCode == ADD_CODE) {
             //과목 중복 체크 통과시 입력후 셋팅
-            if(data!=null){
+            if (data != null) {
                 String item = data.getStringExtra("item");
                 String subject = data.getStringExtra("subject");
                 String s_time = data.getStringExtra("s_time");
@@ -108,7 +109,7 @@ public class TimeTableActivity extends Activity {
 
         //과목 삭제됨
         if (requestCode == DELETE_CODE) {
-            if(data!=null){
+            if (data != null) {
                 U.getInstance().log("새로고침");
                 Intent intent = new Intent(TimeTableActivity.this, TimeTableActivity.class);
                 finish();
@@ -129,16 +130,14 @@ public class TimeTableActivity extends Activity {
         db.collection("timeTables").document(user.getUid()).collection("subjects")
                 .add(sub)
                 .addOnSuccessListener(aVoid -> {
-                            stopPd();
-                            U.getInstance().toast(getApplicationContext(), "시간표가 저장되었습니다.");
-                            settingTimetable();
-                        }
-                )
+                    stopPd();
+                    U.getInstance().toast(getApplicationContext(), "시간표가 저장되었습니다.");
+                    settingTimetable();
+                })
                 .addOnFailureListener(e -> {
-                            stopPd();
-                            U.getInstance().toast(getApplicationContext(), "" + e.getMessage());
-                        }
-                );
+                    stopPd();
+                    U.getInstance().toast(getApplicationContext(), "" + e.getMessage());
+                });
     }
 
     //firestore에서 시간표데이터 불러오기 및 셋팅
@@ -149,32 +148,33 @@ public class TimeTableActivity extends Activity {
         CollectionReference colRef = db.collection("timeTables").document(user.getUid()).collection("subjects");
 
         colRef.get().addOnSuccessListener(documentSnapshots -> {
-                    for (DocumentSnapshot doc : documentSnapshots.getDocuments()) {
-                        Subject sub = doc.toObject(Subject.class);
-                        U.getInstance().log("" + sub.toString());
+            for (DocumentSnapshot doc : documentSnapshots.getDocuments()) {
+                Subject sub = doc.toObject(Subject.class);
+                U.getInstance().log("" + sub.toString());
 
-                        //최초 실행인경우 기존 시간표 불러와서 리스트 생성 -> Firestorage에서 사진 가져오기.
-                        if (!U.getInstance().getBoolean(this, "setList")) {
-                            makeList(sub.getSubject());
-                            downLoadPhoto(sub.getSubject());
-                        }
-                        //firestore에서 꺼내와서 화면에 셋팅
-                        drawTable(sub.getItem(), sub.getS_time(), sub.getE_time(), sub.getSubject(), sub.getColor());
-                    }
-
-
-                    if (!U.getInstance().getBoolean(this, "setList")) {
-
-                        U.getInstance().setBoolean(this, "setList", true);
-                    }
-                    U.getInstance().log("" + U.getInstance().loadSharedPreferencesData(this, "subject").toString());
-                    stopPd();
+                //최초 실행인경우 기존 시간표 불러와서 리스트 생성 -> Firestorage에서 사진 가져오기.
+                if (!U.getInstance().getBoolean(this, "setList")) {
+                    makeList(sub.getSubject());
+                    downLoadPhoto(sub.getSubject());
                 }
-        )
-                .addOnFailureListener(e -> {
-                    U.getInstance().toast(TimeTableActivity.this, "" + e.getMessage());
-                    stopPd();
-                });
+
+                //firestore에서 꺼내와서 화면에 셋팅
+                drawTable(sub.getItem(), sub.getS_time(), sub.getE_time(), sub.getSubject(), sub.getColor());
+            }
+
+
+            if (!U.getInstance().getBoolean(this, "setList")) {
+                //시간표외에 찍힌 사진들 마져 불러오기
+                mkDir("기타");
+                downLoadPhoto("기타");
+                U.getInstance().setBoolean(this, "setList", true);
+            }
+            U.getInstance().log("" + U.getInstance().loadSharedPreferencesData(this, "subject").toString());
+            stopPd();
+        }).addOnFailureListener(e -> {
+            U.getInstance().toast(TimeTableActivity.this, "" + e.getMessage());
+            stopPd();
+        });
     }
 
 
@@ -235,12 +235,12 @@ public class TimeTableActivity extends Activity {
     }
 
     //디렉생성
-    public void mkDir(String sub){
+    public void mkDir(String sub) {
         //외부 저장소에 이 앱을 통해 촬영된 사진만 저장할 directory 경로와 File을 연결
 
-        File mediaStorageDir = new File(this.getExternalFilesDir(Environment.DIRECTORY_DCIM),sub);
-        if(!mediaStorageDir.exists()){ // 해당 directory가 아직 생성되지 않았을 경우 mkdirs(). 즉 directory를 생성한다.
-            if(!mediaStorageDir.mkdir()){// 만약 mkdirs()가 제대로 동작하지 않을 경우, 오류 Log를 출력한 뒤, 해당 method 종료
+        File mediaStorageDir = new File(this.getExternalFilesDir(Environment.DIRECTORY_DCIM), sub);
+        if (!mediaStorageDir.exists()) { // 해당 directory가 아직 생성되지 않았을 경우 mkdirs(). 즉 directory를 생성한다.
+            if (!mediaStorageDir.mkdir()) {// 만약 mkdirs()가 제대로 동작하지 않을 경우, 오류 Log를 출력한 뒤, 해당 method 종료
                 U.getInstance().log("failed to create directory");
                 return;
             }
@@ -248,9 +248,39 @@ public class TimeTableActivity extends Activity {
         }
     }
 
-    //firestorage에서 사진 불러오기
-    public void downLoadPhoto(String subject){
-        StorageReference storageRef = firebaseStorage.getReferenceFromUrl("gs://cambook-31402.appspot.com/");
+    //첫 로그인 시 firestorage에서 사진 불러오기
+    public void downLoadPhoto(String subject) {
+        //과목별 리스트 비교 firestore에 저장한 과목별 사진 url
+        //해당 과목에 디렉토리에 사진 하나하나 모두 저장
+
+
+        //1.
+        CollectionReference colRef = db.collection("photos").document(user.getUid()).collection(subject);
+
+        colRef.get().addOnSuccessListener(documentSnapshots -> {
+
+            //해당과목 사진 하나하나 불러오기
+            for (DocumentSnapshot doc : documentSnapshots.getDocuments()) {
+                DownloadUrl url = doc.toObject(DownloadUrl.class);
+
+                U.getInstance().log("" + url.toString());
+
+                //사진 해당 디렉토리에 저장
+                savePhoto(url.getUrl(),subject, url.getFileName());
+            }
+            stopPd();
+
+
+        }).addOnFailureListener(e -> {
+            U.getInstance().toast(TimeTableActivity.this, "" + e.getMessage());
+            stopPd();
+        });
+
+    }
+
+
+    public void savePhoto(String url, String subject, String fileName){
+        StorageReference httpsReference = firebaseStorage.getReferenceFromUrl(url);
 
 
         File localFile = null;
@@ -259,11 +289,21 @@ public class TimeTableActivity extends Activity {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        StorageReference userSubjectRef = storageRef.child(user.getUid()).child(subject);
-        userSubjectRef.getFile(localFile).addOnSuccessListener(taskSnapshot -> {
 
+        File finalLocalFile = localFile;
+        httpsReference.getFile(localFile).addOnSuccessListener(taskSnapshot -> {
+            U.getInstance().log(finalLocalFile.getPath());
+
+            File mediaStorageDir = new File(this.getExternalFilesDir(Environment.DIRECTORY_DCIM), subject);
+            U.getInstance().moveFile(finalLocalFile.getPath(),mediaStorageDir.getPath(), fileName);
+
+
+        }).addOnFailureListener(e -> {
+            U.getInstance().log(""+e.getMessage());
         });
+
     }
+
 
     //중복확인
     public boolean checkDuplication(String week, String stime, String etime) {

@@ -46,6 +46,13 @@ public class U {
         return context.getSharedPreferences(SAVE_TAG, 0).getBoolean(key, false);
     }
 
+    //초기화
+    public void removeAllPreferences(Context context){
+        SharedPreferences.Editor editor = context.getSharedPreferences(SAVE_TAG, 0).edit();
+        editor.clear();
+        editor.commit();
+    }
+
     //ArrayList를 SP에 저장
 
     public void saveSharedPreferences_Data(Context context, String key, ArrayList<String> dic) {
@@ -236,6 +243,5 @@ public class U {
 
         return day ;
     }
-
 
 }
