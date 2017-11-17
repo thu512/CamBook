@@ -38,6 +38,8 @@
   public *;
 }
 
+
+
 -dontwarn com.yalantis.ucrop**
 -keep class com.yalantis.ucrop** { *; }
 -keep interface com.yalantis.ucrop** { *; }
@@ -54,4 +56,11 @@
 -keepclassmembers class com.mustdo.cambook.Model.** {
   *;
 }
--ignorewarnings
+
+-keep class com.firebase.** { *; }
+-keep class org.apache.** { *; }
+-keepnames class com.fasterxml.jackson.** { *; }
+-keepnames class javax.servlet.** { *; }
+-keepnames class org.ietf.jgss.** { *; }
+-dontwarn org.apache.**
+-dontwarn org.w3c.dom.**

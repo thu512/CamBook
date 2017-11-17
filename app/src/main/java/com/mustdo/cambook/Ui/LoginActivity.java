@@ -405,6 +405,7 @@ public class LoginActivity extends Activity implements GoogleApiClient.OnConnect
                 GoogleSignInAccount account = result.getSignInAccount();
                 firebaseAuthWithGoogle(account);
             } else {
+
                 U.log("google 로그인 실패\n");
                 stopPd();
             }

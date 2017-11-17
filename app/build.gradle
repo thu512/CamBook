@@ -9,10 +9,13 @@ android {
         versionCode 1
         versionName '0.0.0'
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        // Enabling multidex support.
+        multiDexEnabled true
+
     }
     buildTypes {
         release {
-            minifyEnabled true
+            minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
@@ -50,6 +53,8 @@ dependencies {
     compile 'com.werb.pickphotoview:pickphotoview:0.3.0'
     implementation 'com.github.f0ris.sweetalert:library:1.5.2'
     compile 'com.sandrios.android:sandriosCamera:1.0.9'
+    compile 'com.android.support:multidex:1.0.1'
+
 
 }
 apply plugin: 'com.google.gms.google-services'
