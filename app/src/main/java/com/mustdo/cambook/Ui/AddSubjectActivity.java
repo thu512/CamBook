@@ -159,19 +159,19 @@ public class AddSubjectActivity extends Activity {
             binding.editText.setError("과목명을 입력하세요.");
             return false;
         }
-        if (binding.spinner.equals("요일을 선택하세요.")) {
+        if (item.equals("요일을 선택하세요.")) {
             U.getInstance().toast(this, "요일을 선택해주세요.");
             return false;
         }
-        if (binding.spinner1.equals("시작 교시")) {
+        if (s_time.equals("시작 교시")) {
             U.getInstance().toast(this, "시작 교시를 선택해주세요.");
             return false;
         }
-        if (binding.spinner2.equals("시작교시를 선택하세요.")) {
+        if (e_time.equals("시작교시를 선택하세요.")) {
             U.getInstance().toast(this, "시작 교시를 선택해주세요.");
             return false;
         }
-        if (binding.spinner2.equals("끝 교시")) {
+        if (e_time.equals("끝 교시")) {
             U.getInstance().toast(this, "끝 교시를 선택해주세요.");
             return false;
         }
