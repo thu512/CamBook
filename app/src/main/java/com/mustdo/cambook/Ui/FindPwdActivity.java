@@ -15,7 +15,7 @@ import com.mustdo.cambook.databinding.ActivityFindPwdBinding;
 
 public class FindPwdActivity extends Activity {
 
-    ActivityFindPwdBinding binding;
+    private ActivityFindPwdBinding binding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

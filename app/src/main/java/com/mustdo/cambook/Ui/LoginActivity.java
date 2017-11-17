@@ -43,11 +43,8 @@ public class LoginActivity extends Activity implements GoogleApiClient.OnConnect
 
     private ActivityLoginBinding binding;
     private FirebaseAuth firebaseAuth;
-    //구글 페북 파베
     private FirebaseAuth.AuthStateListener mAuthListener;
-
     private static Context context;
-
     private static U U;
 
     // google
@@ -304,6 +301,7 @@ public class LoginActivity extends Activity implements GoogleApiClient.OnConnect
 
     // facebook
     CallbackManager callbackManager;
+
     public void onFaceBookInfoWithAccessToken(final AccessToken token) {
         AuthCredential credential = FacebookAuthProvider.getCredential(token.getToken());
 
@@ -339,17 +337,15 @@ public class LoginActivity extends Activity implements GoogleApiClient.OnConnect
                                         .document(user.getUid())
                                         .set(u)
                                         .addOnSuccessListener(aVoid -> {
-                                                    //U.toast(context, "firestore ok");
-                                                    stopPd();
-                                                    startActivity(new Intent(context, MainActivity.class));
-                                                    finish();
-                                                }
-                                        )
+                                            //U.toast(context, "firestore ok");
+                                            stopPd();
+                                            startActivity(new Intent(context, MainActivity.class));
+                                            finish();
+                                        })
                                         .addOnFailureListener(e -> {
-                                                    stopPd();
-                                                    U.toast(context, "firestone fail" + e.getMessage());
-                                                }
-                                        );
+                                            stopPd();
+                                            U.toast(context, "firestone fail" + e.getMessage());
+                                        });
                             } catch (JSONException e) {
                                 e.printStackTrace();
                                 stopPd();
@@ -406,7 +402,7 @@ public class LoginActivity extends Activity implements GoogleApiClient.OnConnect
                 firebaseAuthWithGoogle(account);
             } else {
 
-                U.log("google 로그인 실패\n"+result.getStatus().getStatusMessage());
+                U.log("google 로그인 실패\n" + result.getStatus().getStatusMessage());
                 stopPd();
             }
         } else {
@@ -418,20 +414,18 @@ public class LoginActivity extends Activity implements GoogleApiClient.OnConnect
     }
 
 
-
-
     //백키에 대응하는 메소드
     @Override
     public void onBackPressed() {
         //아래코드를 막으면 현재 화면의 종료처리가 중단됨
         //super.onBackPressed();
-        if(!isFirstEnd){
+        if (!isFirstEnd) {
             //최초한번 백키를 눌렀다.
-            isFirstEnd=true;
+            isFirstEnd = true;
             //3초후에 초기화된다.(최초로 한번 백키를 눌렀던 상황이)
-            handler.sendEmptyMessageDelayed(1,3000);
+            handler.sendEmptyMessageDelayed(1, 3000);
             U.getInstance().toast(this, "뒤로가기를 한번 더 누르시면 종료됩니다.");
-        }else{
+        } else {
             super.onBackPressed();
         }
     }
@@ -439,15 +433,15 @@ public class LoginActivity extends Activity implements GoogleApiClient.OnConnect
     boolean isFirstEnd; //백키를 한번 눌렀나?
 
     //핸들러, 메세지를 던져서 큐에 담고 하나씩 꺼내서 처리하는 메시징 시스템
-    Handler handler = new Handler(){
+    Handler handler = new Handler() {
         //이 메소드는 큐에 메세지가 존재하면 뽑아서 호출된다.
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
-            if(msg.what == 0){ //최초로 백키를 한번 눌렀다.
+            if (msg.what == 0) { //최초로 백키를 한번 눌렀다.
 
-            }else if(msg.what == 1){ //3초가 지났다. 다시 초기화.
-                isFirstEnd=false;
+            } else if (msg.what == 1) { //3초가 지났다. 다시 초기화.
+                isFirstEnd = false;
             }
         }
     };

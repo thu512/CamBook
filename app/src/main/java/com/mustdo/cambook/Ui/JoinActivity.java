@@ -16,8 +16,8 @@ import com.mustdo.cambook.Util.U;
 import com.mustdo.cambook.databinding.ActivityJoinBinding;
 
 public class JoinActivity extends Activity {
-    ActivityJoinBinding binding;
-    FirebaseAuth firebaseAuth;
+    private ActivityJoinBinding binding;
+    private FirebaseAuth firebaseAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,13 +33,12 @@ public class JoinActivity extends Activity {
 
         //익명에서 전환인지, 신규인지
         binding.btn1.setOnClickListener(view -> {
-                    if (anony) {
-                        onAnLinkEmail();
-                    } else {
-                        onEmailSignUp();
-                    }
-                }
-        );
+            if (anony) {
+                onAnLinkEmail();
+            } else {
+                onEmailSignUp();
+            }
+        });
     }
 
     //이메일 회원가입
@@ -54,15 +53,14 @@ public class JoinActivity extends Activity {
         final String name = binding.name.getText().toString();
 
         firebaseAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        //실시간 디비에 회원 정보 삽입
-                        insertUserInfo(firebaseAuth.getCurrentUser(), password, email, name);
-                    } else {
-                        stopPd();
-                        U.getInstance().toast(getApplicationContext(), "가입실패.\n" + task.getException().getMessage());
-                    }
-                }
-        );
+            if (task.isSuccessful()) {
+                //실시간 디비에 회원 정보 삽입
+                insertUserInfo(firebaseAuth.getCurrentUser(), password, email, name);
+            } else {
+                stopPd();
+                U.getInstance().toast(getApplicationContext(), "가입실패.\n" + task.getException().getMessage());
+            }
+        });
 
     }
 
@@ -77,19 +75,17 @@ public class JoinActivity extends Activity {
                 .document(user.getUid())
                 .set(u)
                 .addOnSuccessListener(aVoid -> {
-                            stopPd();
-                            U.getInstance().toast(getApplicationContext(), "firestone ok");
-                            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                            startActivity(intent);
-                            finish();
-                        }
-                )
+                    stopPd();
+                    U.getInstance().toast(getApplicationContext(), "firestone ok");
+                    Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent);
+                    finish();
+                })
                 .addOnFailureListener(e -> {
-                            stopPd();
-                            U.getInstance().toast(getApplicationContext(), "firestone fail" + e.getMessage());
-                        }
-                );
+                    stopPd();
+                    U.getInstance().toast(getApplicationContext(), "firestone fail" + e.getMessage());
+                });
     }
 
 
@@ -118,17 +114,18 @@ public class JoinActivity extends Activity {
                                                 "email", email,
                                                 "pwd", password,
                                                 "name", name
-                                        ).addOnSuccessListener(aVoid -> {
+                                        )
+                                        .addOnSuccessListener(aVoid -> {
                                             stopPd();
                                             Intent intent = new Intent(getApplicationContext(), StartActivity.class);
                                             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                                             startActivity(intent);
                                             finish();
-                                        }
-                                ).addOnFailureListener(e -> {
-                                    stopPd();
-                                    U.getInstance().toast(getApplicationContext(), "firestore fail" + e.getMessage());
-                                });
+                                        })
+                                        .addOnFailureListener(e -> {
+                                            stopPd();
+                                            U.getInstance().toast(getApplicationContext(), "firestore fail" + e.getMessage());
+                                        });
                             } else {
                                 //실패 사유 보여주기
                                 stopPd();

@@ -31,7 +31,7 @@ import java.io.File;
 import java.util.ArrayList;
 
 public class MainActivity extends Activity {
-    ActivityMainBinding binding;
+    private ActivityMainBinding binding;
     private static final int CAPTURE_MEDIA = 368;
     private FirebaseFirestore db;
     private FirebaseAuth firebaseAuth;

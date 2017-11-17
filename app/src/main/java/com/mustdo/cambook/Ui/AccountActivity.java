@@ -28,10 +28,10 @@ import java.io.File;
 
 public class AccountActivity extends Activity implements GoogleApiClient.OnConnectionFailedListener {
 
-    ActivityAccountBinding binding;
-    FirebaseAuth firebaseAuth;
-    FirebaseFirestore db;
-    FirebaseUser user;
+    private ActivityAccountBinding binding;
+    private FirebaseAuth firebaseAuth;
+    private FirebaseFirestore db;
+    private FirebaseUser user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

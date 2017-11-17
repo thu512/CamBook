@@ -15,7 +15,7 @@ import com.mustdo.cambook.Util.U;
 import com.mustdo.cambook.databinding.ActivitySettingBinding;
 
 public class SettingActivity extends AppCompatActivity {
-    ActivitySettingBinding binding;
+    private ActivitySettingBinding binding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
