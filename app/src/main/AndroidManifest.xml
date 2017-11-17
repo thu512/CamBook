@@ -28,7 +28,7 @@
             android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/file_paths"/>
+                android:resource="@xml/pick_file_paths"/>
         </provider>
 
         <activity android:name=".Ui.StartActivity">
@@ -42,6 +42,8 @@
         <activity android:name=".Ui.LoginActivity" />
         <activity android:name=".Ui.JoinActivity" />
         <activity android:name=".Ui.FindPwdActivity" />
+        <activity android:name=".Ui.PickImagePreviewActivity"/>
+        <activity android:name=".Ui.PickPhotoActivity"/>
         <!-- facebook -->
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"

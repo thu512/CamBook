@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.provider.MediaStore;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -24,8 +25,11 @@ import com.mustdo.cambook.Util.U;
 import com.mustdo.cambook.databinding.ActivityMainBinding;
 import com.sandrios.sandriosCamera.internal.SandriosCamera;
 import com.sandrios.sandriosCamera.internal.configuration.CameraConfiguration;
-import com.werb.pickphotoview.PickPhotoView;
+import com.mustdo.cambook.List.PickPhotoView;
+import com.werb.pickphotoview.model.DirImage;
+import com.werb.pickphotoview.model.GroupImage;
 import com.werb.pickphotoview.util.PickConfig;
+import com.werb.pickphotoview.util.PickPreferences;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -68,16 +72,19 @@ public class MainActivity extends Activity {
 
         //앨범
         binding.btn2.setOnClickListener(view -> {
+
+            U.getInstance().log(""+MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
             new PickPhotoView.Builder(MainActivity.this)
                     .setPickPhotoSize(1)                  // select image size
                     .setClickSelectable(true)             // click one image immediately close and return image
                     .setShowCamera(true)                  // is show camera
                     .setSpanCount(3)                      // span count
-                    .setLightStatusBar(true)              // lightStatusBar used in Android M or higher
-                    .setStatusBarColor("#ffffff")     // statusBar color
-                    .setToolbarColor("#ffffff")       // toolbar color
-                    .setSelectIconColor("#5185C7")     // select icon color
                     .start();
+
+            DirImage g = PickPreferences.getInstance(this).getDirImage();
+            GroupImage g1 = PickPreferences.getInstance(this).getListImage();
+
+            U.getInstance().log(""+g1.mGroupMap.toString());
         });
 
         //시간표
@@ -141,7 +148,8 @@ public class MainActivity extends Activity {
         }
     }
 
-    //해당요일 시간에 포함되는 과목명 리턴 / 없으면 기타...
+    //해당요일 시간에 포함되는 과목명 리턴 / 없으면 기타...ls
+
     public void getSubjectSave(String filePath, String fileName, String day, String tm) {
         showPd();
 
