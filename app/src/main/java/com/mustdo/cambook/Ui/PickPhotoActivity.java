@@ -75,6 +75,7 @@ public class PickPhotoActivity extends AppCompatActivity {
         initToolbar();
         initRecyclerView();
         initSelectLayout();
+        PickPhotoActivity.this.startPhotoListActivity();
     }
 
     @Override
@@ -131,7 +132,7 @@ public class PickPhotoActivity extends AppCompatActivity {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                //DB에 저장된 과목명을 리스트로 가져오기
+
                 arraySubList = U.getInstance().loadSharedPreferencesData(PickPhotoActivity.this,"subject");
                 arraySubList.add("기타");
                 ArrayList<String> dirNames = new ArrayList<>();
@@ -164,42 +165,6 @@ public class PickPhotoActivity extends AppCompatActivity {
                     }
 
                 }
-                /*
-                while (filePaths) {
-                    // get image path
-                    String path = mCursor.getString(mCursor
-                            .getColumnIndex(MediaStore.Images.Media.DATA));
-
-                    File file = new File(path);
-                    if(!file.exists()){
-                        continue;
-                    }
-
-                    // get image parent name
-                    String parentName = new File(path).getParentFile().getName();
-                    Log.d(PickConfig.TAG, parentName + ":" + path);
-
-                    // save all Photo
-                    if (!mGroupMap.containsKey(PickConfig.ALL_PHOTOS)) {
-                        dirNames.add(PickConfig.ALL_PHOTOS);
-                        ArrayList<String> chileList = new ArrayList<>();
-                        chileList.add(path);
-                        mGroupMap.put(PickConfig.ALL_PHOTOS, chileList);
-                    } else {
-                        mGroupMap.get(PickConfig.ALL_PHOTOS).add(path);
-                    }
-                    // save by parent name
-                    if (!mGroupMap.containsKey(parentName)) {
-                        dirNames.add(parentName);
-                        ArrayList<String> chileList = new ArrayList<>();
-                        chileList.add(path);
-                        mGroupMap.put(parentName, chileList);
-                    } else {
-                        mGroupMap.get(parentName).add(path);
-                    }
-                }
-                mCursor.close();
-                */
                 GroupImage groupImage = new GroupImage();
                 groupImage.mGroupMap = mGroupMap;
                 DirImage dirImage = new DirImage();
@@ -208,19 +173,24 @@ public class PickPhotoActivity extends AppCompatActivity {
                 PickPreferences.getInstance(activity).saveDirNames(dirImage);
 
                 allPhotos = groupImage.mGroupMap.get(ALL_PHOTOS);
-
+                Log.d("TTT","어댑터만들러옴");
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
+                        Log.d("TTT","어댑터만들러옴2");
                         if(allPhotos == null){
                             Log.d("PickPhotoView","Image is Empty");
+                            Log.d("TTT","어댑터만들러옴3");
                         }else {
                             Log.d("All photos size:", String.valueOf(allPhotos.size()));
+                            Log.d("TTT","어댑터만들러옴4"+String.valueOf(allPhotos.size()));
                         }
                         if (allPhotos != null && !allPhotos.isEmpty()) {
+                            Log.d("TTT","어댑터만들러옴5");
                             pickGridAdapter = new PickGridAdapter(PickPhotoActivity.this, allPhotos, pickData, imageClick);
                             photoList.setAdapter(pickGridAdapter);
                         }
+                        Log.d("TTT","어댑터만들러옴6");
                     }
                 });
 
@@ -303,6 +273,7 @@ public class PickPhotoActivity extends AppCompatActivity {
     View.OnClickListener imageClick = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
+
             String imgPath = (String) v.getTag(R.id.pick_image_path);
             String[] imgNameArr = imgPath.split("/");
             String imgName = imgNameArr[imgNameArr.length-1];
@@ -325,11 +296,13 @@ public class PickPhotoActivity extends AppCompatActivity {
     };
 
     public void select(){
+        Log.i("TTT","미리보기1");
         if(pickGridAdapter == null){
             return;
         }
 
         if (!pickGridAdapter.getSelectPath().isEmpty()) {
+            Log.i("TTT","미리보기 시작");
             Intent intent = new Intent();
             intent.putExtra(PickConfig.INTENT_IMG_LIST_SELECT, pickGridAdapter.getSelectPath());
             setResult(PickConfig.PICK_PHOTO_DATA, intent);

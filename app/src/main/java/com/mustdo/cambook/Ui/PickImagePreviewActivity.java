@@ -73,11 +73,12 @@ public class PickImagePreviewActivity extends PickPhotoPreviewActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(com.werb.pickphotoview.R.layout.pick_activty_preview_photo);
+        Log.i("TTT","미리보기2");
         pickData = (PickData) getIntent().getSerializableExtra(PickConfig.INTENT_PICK_DATA);
         path = getIntent().getStringExtra(PickConfig.INTENT_IMG_PATH);
-        name = getIntent().getStringExtra(PickConfig.INTENT_DIR_NAME).split("_");   //IMG_20170919_203942.jpg
-        imgDate = name[1].substring(0,4)+"-"+name[1].substring(4,6)+"-"+name[1].substring(6,8)+" ";
-        imgTime = name[2].substring(0,2)+":"+name[2].substring(2,4);
+        name = getIntent().getStringExtra(PickConfig.INTENT_DIR_NAME).split("_");   //IMG_2017_09_19_20_39_42.jpg
+        imgDate = name[1]+"-"+name[2]+"-"+name[3]+" ";
+        imgTime = name[4]+":"+name[5];
 
         allImagePath = (ArrayList<String>) getIntent().getSerializableExtra(PickConfig.INTENT_IMG_LIST);
         imageViews = new ArrayList<>();

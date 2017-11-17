@@ -75,10 +75,14 @@ public class MainActivity extends Activity {
 
             U.getInstance().log(""+MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
             new PickPhotoView.Builder(MainActivity.this)
-                    .setPickPhotoSize(1)                  // select image size
-                    .setClickSelectable(true)             // click one image immediately close and return image
-                    .setShowCamera(true)                  // is show camera
-                    .setSpanCount(3)                      // span count
+                    .setPickPhotoSize(6)
+                    .setShowCamera(false)
+                    .setSpanCount(4)
+                    .setLightStatusBar(false)
+                    .setStatusBarColor("#305E98")
+                    .setToolbarColor("#5185C7")
+                    .setToolbarIconColor("#ffffff")
+                    .setClickSelectable(false)
                     .start();
 
             DirImage g = PickPreferences.getInstance(this).getDirImage();

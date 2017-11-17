@@ -49,8 +49,11 @@ public class AccountActivity extends Activity implements GoogleApiClient.OnConne
         } else {
             DocumentReference userRef = db.collection("users").document(user.getUid());
             userRef.get().addOnSuccessListener(documentSnapshots -> {
-                User user = documentSnapshots.toObject(User.class);
-                binding.idbox.setText("" + user.getName());
+                if(documentSnapshots != null){
+                    User user = documentSnapshots.toObject(User.class);
+                    binding.idbox.setText("" + user.getName());
+                }
+
             }).addOnFailureListener(e -> {
                 U.getInstance().toast(AccountActivity.this, "" + e.getMessage());
             });
