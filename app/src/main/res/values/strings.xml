@@ -17,7 +17,6 @@
     <string name="signup_msg">회원가입</string>
     <string name="signup">회원가입</string>
 
-    <string name="id">아이디</string>
     <string name="pw">비밀번호</string>
     <string name="email">이메일</string>
     <string name="name">이름</string>
@@ -25,8 +24,6 @@
     <string name="signin_msg">비회원으로 이용하기</string>
 
 
-    <string name="id_hint">ID를 입력하세요</string>
-    <string name="pw_hint">비밀번호를 입력하세요</string>
     <string name="findid">비밀번호를 잊으셨습니까?</string>
     <string name="color_btn">배경색 선택</string>
     <string name="add_sub">추가하기</string>
