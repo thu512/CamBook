@@ -84,12 +84,20 @@ public class DeleteSubjectActivity extends Activity {
                 U.getInstance().toast(DeleteSubjectActivity.this, "삭제할 과목을 선택해주세요.");
                 return;
             }
-            //firestore 에서 과목 삭제 / sp에서 과목 삭제
-            deleteSp(select);
-            deletePhoto(select);
-            deletePhotoUrl(user.getUid(), select);
-            deleteFirestore(select);
-            rmDir(select);
+
+            U.getInstance().showPopup3(this, "과목 삭제", "해당 과목 사진도\n 모두 삭제됩니다."
+                    , "확인"
+                    , sweetAlertDialog -> {
+                        //firestore 에서 과목 삭제 / sp에서 과목 삭제
+                        deleteSp(select);
+                        deletePhoto(select);
+                        deletePhotoUrl(user.getUid(), select);
+                        deleteFirestore(select);
+                        rmDir(select);
+                        sweetAlertDialog.dismissWithAnimation();
+                    }, "취소"
+                    , sweetAlertDialog -> sweetAlertDialog.dismissWithAnimation()
+            );
         });
     }
 
@@ -164,7 +172,7 @@ public class DeleteSubjectActivity extends Activity {
         });
     }
 
-    public void deletePhoto(String subject){
+    public void deletePhoto(String subject) {
         StorageReference storageRef = firebaseStorage.getReference();
 
 
@@ -172,9 +180,9 @@ public class DeleteSubjectActivity extends Activity {
 
 
         desertRef.delete().addOnSuccessListener(aVoid -> {
-            U.getInstance().toast(this,subject+" 모든 사진이 삭제되었습니다.");
+            U.getInstance().toast(this, subject + " 모든 사진이 삭제되었습니다.");
         }).addOnFailureListener(e -> {
-            U.getInstance().log(""+e.getMessage());
+            U.getInstance().log("" + e.getMessage());
         });
     }
 

@@ -74,9 +74,9 @@ public class StartActivity extends Activity {
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        boolean f1=false;
-        boolean f2=false;
-        boolean f3=false;
+        boolean f1=true;
+        boolean f2=true;
+        boolean f3=true;
         switch (requestCode){
             case MULTIPLE_PERMISSIONS: {
                 if(grantResults.length > 0){
@@ -84,18 +84,21 @@ public class StartActivity extends Activity {
                         if(permissions[i].equals(this.permissions[0])){
                             if(grantResults[i] != PackageManager.PERMISSION_GRANTED){
                                 popup();
+                                f1=false;
                             }else{
                                 f1=true;
                             }
                         }else if(permissions[i].equals(this.permissions[1])){
                             if(grantResults[i] != PackageManager.PERMISSION_GRANTED){
                                 popup();
+                                f2=false;
                             }else{
                                 f2=true;
                             }
                         }else if(permissions[i].equals(this.permissions[2])){
                             if(grantResults[i] != PackageManager.PERMISSION_GRANTED){
                                 popup();
+                                f3=false;
                             }else{
                                 f3=true;
                             }

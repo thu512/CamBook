@@ -23,6 +23,8 @@ public class JoinActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_join);
+        binding.back.setOnClickListener(view -> finish());
+
         Intent intent = getIntent();
         final Boolean anony = intent != null ? intent.getBooleanExtra("Anony", false) : false;
 
