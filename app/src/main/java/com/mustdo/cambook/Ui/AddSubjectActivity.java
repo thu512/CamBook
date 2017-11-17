@@ -198,6 +198,11 @@ public class AddSubjectActivity extends Activity {
         colors.add("#A4A0C4");
         colors.add("#AFB0A6");
 
+        colors.add("#FFD9FA");
+        colors.add("#CEFBC9");
+        colors.add("#FAE0D4");
+        colors.add("#BFA0ED");
+        colors.add("#E5D85C");
 
         colorPicker.setTitle("색상을 선택하세요.")
                 .setColors(colors)

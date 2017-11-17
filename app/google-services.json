@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "397639391103-va7tnubjthussr5a9gfqha4vrjpuaobb.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.mustdo.cambook",
+            "certificate_hash": "d80abf99c5a42999055f24b9ab7ed10ca80ebb0e"
+          }
+        },
+        {
           "client_id": "397639391103-1uq1k0eqri7hfvmc01t9b8ej2nk48ffv.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
