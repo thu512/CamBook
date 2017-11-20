@@ -196,7 +196,7 @@
             android:layout_weight="1"
             android:text="@string/signup_ok"
             android:textSize="18.5sp"
-            android:textColor="#ffffff"
+            android:textColor="#4a4a4a"
             android:textStyle="bold"
             android:background="@null" />
     </LinearLayout>
