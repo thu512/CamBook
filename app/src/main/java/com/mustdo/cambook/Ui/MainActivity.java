@@ -115,7 +115,7 @@ public class MainActivity extends Activity {
 
 
             U.getInstance().log("사진 경로: " + data.getStringExtra(CameraConfiguration.Arguments.FILE_PATH) + " 날짜: " + date);
-            U.getInstance().toast(this, "Media captured.");
+            //U.getInstance().toast(this, "Media captured.");
 
 
             //사진을 저장할 과목명 디렉토리 설정

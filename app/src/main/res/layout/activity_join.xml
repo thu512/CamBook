@@ -58,7 +58,7 @@
         android:layout_height="0dp"
         android:layout_gravity="center"
         android:layout_weight="8.6"
-        android:background="@drawable/white_ract"
+        android:background="@drawable/white_top"
         android:orientation="horizontal">
 
 
@@ -99,7 +99,7 @@
         android:layout_height="0dp"
         android:layout_gravity="center"
         android:layout_weight="8.6"
-        android:background="@drawable/white_ract"
+        android:background="@drawable/white_top"
         android:orientation="horizontal">
 
 
@@ -180,7 +180,8 @@
     <android.support.v4.widget.Space
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="47.5"/>
+        android:layout_weight="47.5"
+        />
 
     <LinearLayout
         android:layout_width="match_parent"

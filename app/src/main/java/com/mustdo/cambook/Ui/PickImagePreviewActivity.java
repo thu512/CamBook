@@ -7,7 +7,6 @@ import android.os.Environment;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -71,9 +70,11 @@ public class PickImagePreviewActivity extends PickPhotoPreviewActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        //타이틀바 숨기기
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
         super.onCreate(savedInstanceState);
         setContentView(com.werb.pickphotoview.R.layout.pick_activty_preview_photo);
-        Log.i("TTT","미리보기2");
+
         pickData = (PickData) getIntent().getSerializableExtra(PickConfig.INTENT_PICK_DATA);
         path = getIntent().getStringExtra(PickConfig.INTENT_IMG_PATH);
         name = getIntent().getStringExtra(PickConfig.INTENT_DIR_NAME).split("_");   //IMG_2017_09_19_20_39_42.jpg
@@ -95,7 +96,7 @@ public class PickImagePreviewActivity extends PickPhotoPreviewActivity {
             imageViews.add(imageView);
         }
         initView();
-        Log.d("image size", allImagePath.size() + "");
+        //Log.d("image size", allImagePath.size() + "");
     }
 
     private void initView() {
@@ -129,7 +130,6 @@ public class PickImagePreviewActivity extends PickPhotoPreviewActivity {
             public void onClick(View view) {
 
                     PickImagePreviewActivity.this.openOptionsMenu();
-
             }
         });
 
@@ -270,8 +270,8 @@ public class PickImagePreviewActivity extends PickPhotoPreviewActivity {
     private void changePage(String path){
         String[] nameArr = path.split("/");
         String[] name = nameArr[nameArr.length-1].split("_");
-        imgDate = name[1].substring(0,4)+"-"+name[1].substring(4,6)+"-"+name[1].substring(6,8)+" ";
-        imgTime = name[1].substring(0,2)+":"+name[2].substring(2,4);
+        imgDate = name[1]+"-"+name[2]+"-"+name[3]+" ";
+        imgTime = name[4]+":"+name[5];
 
         myToolbar.setPhotoDirName(imgDate+imgTime);
 

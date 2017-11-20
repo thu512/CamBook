@@ -13,7 +13,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.LinearLayout;
@@ -173,24 +172,24 @@ public class PickPhotoActivity extends AppCompatActivity {
                 PickPreferences.getInstance(activity).saveDirNames(dirImage);
 
                 allPhotos = groupImage.mGroupMap.get(ALL_PHOTOS);
-                Log.d("TTT","어댑터만들러옴");
+
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Log.d("TTT","어댑터만들러옴2");
+
                         if(allPhotos == null){
-                            Log.d("PickPhotoView","Image is Empty");
-                            Log.d("TTT","어댑터만들러옴3");
+                            //Log.d("PickPhotoView","Image is Empty");
+
                         }else {
-                            Log.d("All photos size:", String.valueOf(allPhotos.size()));
-                            Log.d("TTT","어댑터만들러옴4"+String.valueOf(allPhotos.size()));
+                            //Log.d("All photos size:", String.valueOf(allPhotos.size()));
+
                         }
                         if (allPhotos != null && !allPhotos.isEmpty()) {
-                            Log.d("TTT","어댑터만들러옴5");
+
                             pickGridAdapter = new PickGridAdapter(PickPhotoActivity.this, allPhotos, pickData, imageClick);
                             photoList.setAdapter(pickGridAdapter);
                         }
-                        Log.d("TTT","어댑터만들러옴6");
+
                     }
                 });
 
@@ -296,13 +295,12 @@ public class PickPhotoActivity extends AppCompatActivity {
     };
 
     public void select(){
-        Log.i("TTT","미리보기1");
         if(pickGridAdapter == null){
             return;
         }
 
         if (!pickGridAdapter.getSelectPath().isEmpty()) {
-            Log.i("TTT","미리보기 시작");
+
             Intent intent = new Intent();
             intent.putExtra(PickConfig.INTENT_IMG_LIST_SELECT, pickGridAdapter.getSelectPath());
             setResult(PickConfig.PICK_PHOTO_DATA, intent);

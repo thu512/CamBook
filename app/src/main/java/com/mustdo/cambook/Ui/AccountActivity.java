@@ -5,7 +5,6 @@ import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.NonNull;
-import android.util.Log;
 import android.view.View;
 
 import com.facebook.login.LoginManager;
@@ -110,19 +109,19 @@ public class AccountActivity extends Activity implements GoogleApiClient.OnConne
         // 과목별 사진 저장소 path
         File dir = new File(this.getExternalFilesDir(Environment.DIRECTORY_DCIM),"");
 
-        Log.d("TTT",dir.getPath());
+        //Log.d("TTT",dir.getPath());
 
 
 
         String[] children = dir.list();
-        for(String n : children){
-            Log.d("TTT",""+n);
-        }
+//        for(String n : children){
+//            //Log.d("TTT",""+n);
+//        }
 
         if (children != null) {
             for(String n : children){
                 File mediaStorageDir = new File(dir,n);
-                Log.d("TTT",""+mediaStorageDir.getPath());
+                //Log.d("TTT",""+mediaStorageDir.getPath());
                 File[] childFileList = mediaStorageDir.listFiles();
                 for(File childFile : childFileList)
                 {
@@ -132,10 +131,10 @@ public class AccountActivity extends Activity implements GoogleApiClient.OnConne
             }
         }//if
 
-        children = dir.list();
-        for(String n : children){
-            Log.d("TTT","삭제후 "+n);
-        }
+//        children = dir.list();
+//        for(String n : children){
+//            Log.d("TTT","삭제후 "+n);
+//        }
 
     }//public void removeFiles()
 

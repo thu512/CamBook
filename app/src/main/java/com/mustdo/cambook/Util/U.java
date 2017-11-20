@@ -145,7 +145,7 @@ public class U {
 
 
     public void log(String msg){
-        Log.d("TTT",""+msg);
+        //Log.d("TTT",""+msg);
     }
 
 
