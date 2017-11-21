@@ -2,6 +2,10 @@ package com.mustdo.cambook.Util;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
+import android.media.ExifInterface;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -167,11 +171,10 @@ public class U {
             in = new FileInputStream(inputFile);
             out = new FileOutputStream(outputPath +"/"+ outputFile);
 
-            byte[] buffer = new byte[1024];
-            int read;
-            while ((read = in.read(buffer)) != -1) {
-                out.write(buffer, 0, read);
-            }
+            Bitmap bitmap = getRotatedPhoto(inputFile); //inputfile 사진 회전
+            bitmap.compress(Bitmap.CompressFormat.JPEG,100,out); //회전한 사진을 out에 저장
+
+
             in.close();
             in = null;
 
@@ -194,6 +197,8 @@ public class U {
         }
 
     }
+
+
 
 
     //특정 날짜 요일 구하기
@@ -242,6 +247,68 @@ public class U {
         }
 
         return day ;
+    }
+
+
+    //사진 회전 메소드
+    public Bitmap getRotatedPhoto(String path){
+        try{
+            Bitmap image = BitmapFactory.decodeFile(path);
+
+            ExifInterface exif= new ExifInterface(path);
+            int exifOrientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED);
+
+            Bitmap bmRotated = rotateBitmap(image, exifOrientation);
+
+            return bmRotated;
+        }catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
+
+    }
+
+    //회전된 각도에 따라 사진 회전
+    public Bitmap rotateBitmap(Bitmap bitmap, int orientation){
+        Matrix matrix = new Matrix();
+        switch (orientation){
+            case ExifInterface.ORIENTATION_NORMAL: return bitmap;
+            case ExifInterface.ORIENTATION_FLIP_HORIZONTAL:
+                matrix.setScale(-1,1);
+                break;
+            case ExifInterface.ORIENTATION_ROTATE_180:
+                matrix.setRotate(180);
+                break;
+            case ExifInterface.ORIENTATION_FLIP_VERTICAL:
+                matrix.setRotate(180);
+                matrix.postScale(-1,1);
+                break;
+            case ExifInterface.ORIENTATION_TRANSPOSE:
+                matrix.setRotate(90);
+                matrix.postScale(-1,1);
+                break;
+            case ExifInterface.ORIENTATION_ROTATE_90:
+                matrix.setRotate(90);
+                break;
+            case ExifInterface.ORIENTATION_TRANSVERSE:
+                matrix.setRotate(-90);
+                matrix.postScale(-1,1);
+                break;
+            case ExifInterface.ORIENTATION_ROTATE_270:
+                matrix.setRotate(-90);
+                break;
+            default:
+                return bitmap;
+
+        }
+        try{
+            Bitmap bmRotated = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(),matrix,true);
+            bitmap.recycle();
+            return bmRotated;
+        }catch (OutOfMemoryError e){
+            e.printStackTrace();
+            return null;
+        }
     }
 
 }
