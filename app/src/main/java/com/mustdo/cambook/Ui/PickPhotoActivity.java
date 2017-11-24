@@ -13,6 +13,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.LinearLayout;
@@ -58,6 +59,10 @@ public class PickPhotoActivity extends AppCompatActivity {
     private HashMap<String, ArrayList<String>> mGroupMap = new LinkedHashMap<>();
 
     private final String ALL_PHOTOS = "모든 사진";
+    private final String SUBJECT_NAME = "subject";
+
+
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -71,12 +76,19 @@ public class PickPhotoActivity extends AppCompatActivity {
         } else {
             pickData = PickPreferences.getInstance(PickPhotoActivity.this).getPickData();
         }
+
         initToolbar();
         initRecyclerView();
         initSelectLayout();
         PickPhotoActivity.this.startPhotoListActivity();
+
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+    }
     @Override
     public void finish() {
         super.finish();
@@ -136,7 +148,10 @@ public class PickPhotoActivity extends AppCompatActivity {
                 arraySubList.add("기타");
                 ArrayList<String> dirNames = new ArrayList<>();
 
+
+
                 for(String sub: arraySubList){
+
                     File[] fileList = new File(getExternalFilesDir(Environment.DIRECTORY_DCIM),sub).listFiles();
                     if(fileList != null){
                         for(File f: fileList){
@@ -148,6 +163,7 @@ public class PickPhotoActivity extends AppCompatActivity {
                                 chileList.add(path);
                                 mGroupMap.put(ALL_PHOTOS, chileList);
                             } else {
+
                                 mGroupMap.get(ALL_PHOTOS).add(path);
                             }
                             // save by parent name
@@ -161,9 +177,12 @@ public class PickPhotoActivity extends AppCompatActivity {
                             }
 
                         }
+
+
                     }
 
                 }
+
                 GroupImage groupImage = new GroupImage();
                 groupImage.mGroupMap = mGroupMap;
                 DirImage dirImage = new DirImage();
@@ -185,7 +204,6 @@ public class PickPhotoActivity extends AppCompatActivity {
 
                         }
                         if (allPhotos != null && !allPhotos.isEmpty()) {
-
                             pickGridAdapter = new PickGridAdapter(PickPhotoActivity.this, allPhotos, pickData, imageClick);
                             photoList.setAdapter(pickGridAdapter);
                         }
@@ -273,6 +291,7 @@ public class PickPhotoActivity extends AppCompatActivity {
         @Override
         public void onClick(View v) {
 
+
             String imgPath = (String) v.getTag(R.id.pick_image_path);
             String[] imgNameArr = imgPath.split("/");
             String imgName = imgNameArr[imgNameArr.length-1];
@@ -283,6 +302,7 @@ public class PickPhotoActivity extends AppCompatActivity {
             intent.putExtra(PickConfig.INTENT_IMG_LIST, allPhotos);
             intent.putExtra(PickConfig.INTENT_IMG_LIST_SELECT, pickGridAdapter.getSelectPath());
             intent.putExtra(PickConfig.INTENT_PICK_DATA, pickData);
+            intent.putExtra(SUBJECT_NAME,getString(R.string.photo));
             startActivityForResult(intent, PickConfig.PREVIEW_PHOTO_DATA);
         }
     };
@@ -327,5 +347,11 @@ public class PickPhotoActivity extends AppCompatActivity {
         }
     };
 
-
+    //사진 삭제하고 intent 넘어왔을 때 앨범화면 갱신
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        finish();
+        startActivity(intent);
+    }
 }

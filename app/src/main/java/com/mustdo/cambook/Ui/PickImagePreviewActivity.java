@@ -4,9 +4,11 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.annotation.NonNull;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -26,6 +28,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 import com.mustdo.cambook.R;
 import com.shizhefei.view.largeimage.LargeImageView;
 import com.shizhefei.view.largeimage.factory.FileBitmapDecoderFactory;
@@ -57,6 +65,9 @@ public class PickImagePreviewActivity extends PickPhotoPreviewActivity {
     private boolean mIsHidden,misSelect;
     private PickData pickData;
 
+    private FirebaseAuth firebaseAuth;
+    private FirebaseStorage firebaseStorage;
+    private FirebaseUser user;
 
     ActionBar actionBar;
     TextView textviewTitle;
@@ -68,18 +79,32 @@ public class PickImagePreviewActivity extends PickPhotoPreviewActivity {
     ArrayList<String> subject=new ArrayList<>();
     String select;
 
+    private final String SUBJECT_NAME = "subject";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         //타이틀바 숨기기
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         super.onCreate(savedInstanceState);
         setContentView(com.werb.pickphotoview.R.layout.pick_activty_preview_photo);
+
+        firebaseAuth = FirebaseAuth.getInstance();
+        user = firebaseAuth.getCurrentUser();
+        firebaseStorage = FirebaseStorage.getInstance();
 
         pickData = (PickData) getIntent().getSerializableExtra(PickConfig.INTENT_PICK_DATA);
         path = getIntent().getStringExtra(PickConfig.INTENT_IMG_PATH);
         name = getIntent().getStringExtra(PickConfig.INTENT_DIR_NAME).split("_");   //IMG_2017_09_19_20_39_42.jpg
         imgDate = name[1]+"-"+name[2]+"-"+name[3]+" ";
         imgTime = name[4]+":"+name[5];
+
+
+        //String subject = getIntent().getStringExtra(SUBJECT_NAME);
+        //PickConfig.INTENT_DIR_NAME
+
+
+
 
         allImagePath = (ArrayList<String>) getIntent().getSerializableExtra(PickConfig.INTENT_IMG_LIST);
         imageViews = new ArrayList<>();
@@ -124,11 +149,12 @@ public class PickImagePreviewActivity extends PickPhotoPreviewActivity {
         });
 
         //옵션 메뉴 클릭
+
         myToolbar.setRightIcon(com.mustdo.cambook.R.mipmap.ic_menu);
         myToolbar.setRightLayoutOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                    //Toast.makeText(PickImagePreviewActivity.this,"룰ㄹ루랄라",Toast.LENGTH_LONG).show();
                     PickImagePreviewActivity.this.openOptionsMenu();
             }
         });
@@ -204,6 +230,7 @@ public class PickImagePreviewActivity extends PickPhotoPreviewActivity {
         }
     }
 
+
     @Override
     public void finish() {
         super.finish();
@@ -274,7 +301,6 @@ public class PickImagePreviewActivity extends PickPhotoPreviewActivity {
         imgTime = name[4]+":"+name[5];
 
         myToolbar.setPhotoDirName(imgDate+imgTime);
-
     }
 
     //액션바 설정
@@ -282,7 +308,7 @@ public class PickImagePreviewActivity extends PickPhotoPreviewActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_imagepreview,menu);
 
-        return true;
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override
@@ -296,21 +322,61 @@ public class PickImagePreviewActivity extends PickPhotoPreviewActivity {
             case R.id.menu_copy:
                 return true;
             case R.id.menu_delete:
-                imageDelete();
-
+                imageDelete();//디렉 사진 삭제, firebase 파일 삭제
                 return true;
         }
 
-        return false;
+        return super.onOptionsItemSelected(item);
     }
     private void imageDelete(){
         File f = new File(path);
-        f.delete();
+        f.delete();//디렉에 있는 해당 파일 삭제
+
+        deleteStorage();//storage에 있는 해당 파일 삭제
+
         Toast.makeText(PickImagePreviewActivity.this, "삭제가 완료되었습니다.", Toast.LENGTH_SHORT).show();
         finish();
         Intent intent = new Intent(PickImagePreviewActivity.this, PickPhotoActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+
+        //intent.setFlags(Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
+        intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        //intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        //intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+        //intent.setFlags(Intent.FLAG_ACTIVITY_PREVIOUS_IS_TOP);
+
+
+
         startActivity(intent);
+    }
+
+    private void deleteStorage(){
+        String[] subjects = path.split("/");
+        String subname = subjects[subjects.length-2];
+
+        String filename = getIntent().getStringExtra(PickConfig.INTENT_DIR_NAME);
+
+        StorageReference storageRef = firebaseStorage.getReferenceFromUrl("gs://cambook-31402.appspot.com/");
+
+        StorageReference desertRef = storageRef.child(user.getUid()).child(subname).child(filename);
+
+        Log.d("deleteSubject",subname);
+        Log.d("deleteFilename",filename);
+
+        desertRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                Toast.makeText(PickImagePreviewActivity.this,"삭제 완료",Toast.LENGTH_SHORT).show();
+                Log.d("deleteStorage","Successed");
+            }
+
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Toast.makeText(PickImagePreviewActivity.this,"삭제 실패",Toast.LENGTH_SHORT).show();
+                Log.d("deleteStorage","Failed");
+            }
+        });
+
     }
     private void imageSave(){
 
