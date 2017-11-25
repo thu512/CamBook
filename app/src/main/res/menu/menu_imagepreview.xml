@@ -10,11 +10,11 @@
         <!--app:showAsAction="never"-->
         <!--android:title="@string/menu_edit"/>-->
 
-    <!--<item-->
-        <!--android:id="@+id/menu_move"-->
-        <!--android:orderInCategory="2"-->
-        <!--app:showAsAction="never"-->
-        <!--android:title="@string/menu_move">-->
+    <item
+        android:id="@+id/menu_move"
+        android:orderInCategory="1"
+        app:showAsAction="never"
+        android:title="@string/menu_move"/>
 
     <!--</item>-->
     <!--<item-->
@@ -25,7 +25,7 @@
 
     <item
         android:id="@+id/menu_delete"
-        android:orderInCategory="4"
+        android:orderInCategory="2"
         app:showAsAction="never"
         android:title="@string/menu_delete"/>
     <!--<item-->

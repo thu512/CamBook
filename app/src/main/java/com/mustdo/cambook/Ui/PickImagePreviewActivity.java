@@ -9,19 +9,14 @@ import android.support.annotation.NonNull;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.animation.DecelerateInterpolator;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.PopupWindow;
 import android.widget.Spinner;
@@ -32,9 +27,15 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.mustdo.cambook.Dialog.ImgMoveDialog;
+import com.mustdo.cambook.Model.DownloadUrl;
 import com.mustdo.cambook.R;
+import com.mustdo.cambook.Util.U;
 import com.shizhefei.view.largeimage.LargeImageView;
 import com.shizhefei.view.largeimage.factory.FileBitmapDecoderFactory;
 import com.werb.pickphotoview.PickPhotoPreviewActivity;
@@ -52,7 +53,6 @@ import java.util.ArrayList;
 
 public class PickImagePreviewActivity extends PickPhotoPreviewActivity {
 
-
     private ArrayList<String> allImagePath;
     private ArrayList<String> selectImagePath;
     private String path;
@@ -65,10 +65,13 @@ public class PickImagePreviewActivity extends PickPhotoPreviewActivity {
     private boolean mIsHidden, misSelect;
     private PickData pickData;
 
+    private FirebaseFirestore db;
     private FirebaseAuth firebaseAuth;
     private FirebaseStorage firebaseStorage;
     private FirebaseUser user;
 
+    private ArrayList<String> subjects;
+    private ImgMoveDialog imgMoveDialog;
 
     View popupView;
     PopupWindow popupWindow;
@@ -82,13 +85,13 @@ public class PickImagePreviewActivity extends PickPhotoPreviewActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
-
         super.onCreate(savedInstanceState);
         setContentView(com.werb.pickphotoview.R.layout.pick_activty_preview_photo);
 
         firebaseAuth = FirebaseAuth.getInstance();
         user = firebaseAuth.getCurrentUser();
         firebaseStorage = FirebaseStorage.getInstance();
+        db=FirebaseFirestore.getInstance();
 
         pickData = (PickData) getIntent().getSerializableExtra(PickConfig.INTENT_PICK_DATA);
         path = getIntent().getStringExtra(PickConfig.INTENT_IMG_PATH);
@@ -152,7 +155,26 @@ public class PickImagePreviewActivity extends PickPhotoPreviewActivity {
                     switch (menuItem.getItemId()) {
 
                         case R.id.menu_delete:
-                            imageDelete();//디렉 사진 삭제, firebase 파일 삭제
+                            U.getInstance().showPopup3(PickImagePreviewActivity.this,
+                                    "경고", "삭제한 데이터는 다시 복구할 수 없습니다.",
+                                    "확인", (sweetAlertDialog -> {
+                                        sweetAlertDialog.dismissWithAnimation();
+                                        imageDelete();//디렉 사진 삭제, firebase 파일 삭제
+                                    }),
+                                    "취소", sweetAlertDialog -> sweetAlertDialog.dismissWithAnimation());
+                            return true;
+
+                        case R.id.menu_move:
+                            imgMoveDialog = new ImgMoveDialog(PickImagePreviewActivity.this,
+                                    view1 -> {
+                                    },
+                                    view1 -> {
+
+                                        imageMove(imgMoveDialog.getSelect());
+                                        imgMoveDialog.dismiss();
+
+                                    });
+                            imgMoveDialog.show();
                             return true;
                     }
                     return true;
@@ -303,13 +325,6 @@ public class PickImagePreviewActivity extends PickPhotoPreviewActivity {
         myToolbar.setPhotoDirName(imgDate + imgTime);
     }
 
-    //액션바 설정
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_imagepreview, menu);
-
-        return super.onCreateOptionsMenu(menu);
-    }
 
     @Override
     public void openOptionsMenu() {
@@ -329,23 +344,18 @@ public class PickImagePreviewActivity extends PickPhotoPreviewActivity {
         }
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-
-            case R.id.menu_delete:
-                imageDelete();//디렉 사진 삭제, firebase 파일 삭제
-                return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
 
     private void imageDelete() {
+        String[] subjects = path.split("/");
+        String subname = subjects[subjects.length - 2];
+
+        String filename = getIntent().getStringExtra(PickConfig.INTENT_DIR_NAME);
+
+
         File f = new File(path);
         f.delete();//디렉에 있는 해당 파일 삭제
-
-        deleteStorage();//storage에 있는 해당 파일 삭제
+        deletePhotoUrl(user.getUid(), subname, filename);
+        deleteStorage(subname, filename);//storage에 있는 해당 파일 삭제
 
         Toast.makeText(PickImagePreviewActivity.this, "삭제가 완료되었습니다.", Toast.LENGTH_SHORT).show();
         finish();
@@ -361,11 +371,34 @@ public class PickImagePreviewActivity extends PickPhotoPreviewActivity {
         startActivity(intent);
     }
 
-    private void deleteStorage() {
-        String[] subjects = path.split("/");
-        String subname = subjects[subjects.length - 2];
 
-        String filename = getIntent().getStringExtra(PickConfig.INTENT_DIR_NAME);
+    public void deletePhotoUrl(String uid, String subject, String filename) {
+        CollectionReference colRef = db.collection("photos")
+                .document(user.getUid())
+                .collection(subject);
+        colRef.get().addOnSuccessListener(documentSnapshots -> {
+            for (DocumentSnapshot doc : documentSnapshots.getDocuments()) {
+
+                DownloadUrl du = doc.toObject(DownloadUrl.class);
+                if (du.getFileName().equals(filename)) {
+                    db.collection("photos")
+                            .document(user.getUid())
+                            .collection(subject)
+                            .document(doc.getId())
+                            .delete().addOnSuccessListener(aVoid -> {
+                        //삭제 성공
+                    }).addOnFailureListener(e -> {
+                        //삭제 실패
+                        U.getInstance().toast(getApplicationContext(), "" + e.getMessage());
+                    });
+                    break;
+                }
+            }
+        });
+    }
+
+    private void deleteStorage(String subname, String filename) {
+
 
         StorageReference storageRef = firebaseStorage.getReferenceFromUrl("gs://cambook-31402.appspot.com/");
 
@@ -391,69 +424,73 @@ public class PickImagePreviewActivity extends PickPhotoPreviewActivity {
 
     }
 
-    private void imageSave() {
+    private void imageMove(String subname) {
 
-
-    }
-
-    private void imageLoad() {
-
-    }
-
-    private void imageChange(final int id) {
-        popupView = getLayoutInflater().inflate(R.layout.activity_submenu, null);
-        popupWindow = new PopupWindow(popupView, LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        popupWindow.setFocusable(true);
-        popupWindow.showAtLocation(popupView, Gravity.CENTER, 0, 0);
-
-        Button cancel = (Button) popupView.findViewById(R.id.popupCancel);
-        cancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                popupWindow.dismiss();
-            }
-        });
-
-        Button submit = (Button) popupView.findViewById(R.id.popupSubmit);
-        submit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (select.equals("앨범 선택") || select.equals("------------------------")) {
-                    Toast.makeText(PickImagePreviewActivity.this, "앨범을 선택해주세요.", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                switch (id) {
-
-
-                }
-                //Toast.makeText(, "Clicked Submit...!", Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        spinner = (Spinner) findViewById(R.id.spinnerSub);
-        String[] files = this.getExternalFilesDir(Environment.DIRECTORY_DCIM).list();
-
-        adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, files);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        //adapter.add("앨범 선택");
         /*
-        for(int i=0; i<files.length; i++){
-            adapter.add(files[i]);
-        }*/
-        spinner.setAdapter(adapter);
-        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                select = parent.getSelectedItem().toString();
-            }
+            firebase 과목 리스트 불러와서 스피너로 선택
+       */
+        String subject = subname;     //이동할 과목 앨범
+        String filename = getIntent().getStringExtra(PickConfig.INTENT_DIR_NAME); //IMG_2017_11_25_12_35_08.jpg
+        String[] subjects = path.split("/");
 
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
+        String subnm = subjects[subjects.length - 2]; //기존 과목
+        Log.d("TTT",subnm+" / "+subject+" / "+filename);
+        //firestore에 파일 삭제 후 새로운 path로 다시 저장
+        movePhotoUrl(subnm,subject,filename);
 
-            }
-        });
+        // 과목별 사진 저장소 path
+        File mediaStorageDir = new File(this.getExternalFilesDir(Environment.DIRECTORY_DCIM), subject);
+
+        //사진을 해당 과목 으로 이동
+        U.getInstance().moveFile(path, mediaStorageDir.getPath(), filename);
+
+
+
+
+        Toast.makeText(PickImagePreviewActivity.this, "사진을 이동하였습니다.", Toast.LENGTH_SHORT).show();
+        finish();
+        Intent intent = new Intent(PickImagePreviewActivity.this, PickPhotoActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+
+        startActivity(intent);
 
     }
 
+    public void movePhotoUrl(String subject, String newSubject, String filename) {
+        CollectionReference colRef = db.collection("photos")
+                .document(user.getUid())
+                .collection(subject);
+        colRef.get().addOnSuccessListener(documentSnapshots -> {
+            for (DocumentSnapshot doc : documentSnapshots.getDocuments()) {
+
+                DownloadUrl du = doc.toObject(DownloadUrl.class);
+                if (du.getFileName().equals(filename)) {
+                    db.collection("photos")
+                            .document(user.getUid())
+                            .collection(subject)
+                            .document(doc.getId())
+                            .delete().addOnSuccessListener(aVoid -> {
+
+                        db.collection("photos").document(user.getUid()).collection(newSubject)
+                                .add(du)
+                                .addOnSuccessListener(aVoid1 -> {
+
+                                    //U.getInstance().toast(getApplicationContext(), "사진이 저장되었습니다.");
+
+                                })
+                                .addOnFailureListener(e -> {
+
+                                    //U.getInstance().toast(getApplicationContext(), "" + e.getMessage());
+                                });
+
+                    }).addOnFailureListener(e -> {
+                        //삭제 실패
+                        U.getInstance().toast(getApplicationContext(), "" + e.getMessage());
+                    });
+                    break;
+                }
+            }
+        });
+    }
 
 }
