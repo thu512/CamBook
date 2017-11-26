@@ -9,13 +9,11 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
-    <uses-feature
-        android:name="android.hardware.camera2"
-        android:required="true" />
+
 
     <application
         android:allowBackup="false"
-        android:icon="@drawable/ic_school_black_24dp"
+        android:icon="@mipmap/ic_launcher_cb"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/Theme.Design.Light.NoActionBar"
@@ -32,26 +30,19 @@
                 android:resource="@xml/pick_file_paths"/>
         </provider>
 
-        <activity android:name=".Ui.StartActivity"
-            >
+        <activity android:name=".Ui.StartActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".Ui.MainActivity"
-            />
-        <activity android:name=".Ui.LoginActivity"
-            />
-        <activity android:name=".Ui.JoinActivity"
-            />
-        <activity android:name=".Ui.FindPwdActivity"
-            />
-        <activity android:name=".Ui.PickImagePreviewActivity"
-            />
-        <activity android:name=".Ui.PickPhotoActivity"
-            />
+        <activity android:name=".Ui.MainActivity" />
+        <activity android:name=".Ui.LoginActivity" />
+        <activity android:name=".Ui.JoinActivity" />
+        <activity android:name=".Ui.FindPwdActivity" />
+        <activity android:name=".Ui.PickImagePreviewActivity"/>
+        <activity android:name=".Ui.PickPhotoActivity"/>
         <!-- facebook -->
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"
@@ -75,16 +66,11 @@
         </activity>
         <!-- facebook -->
 
-        <activity android:name=".Ui.AccountActivity"
-            />
-        <activity android:name=".Ui.TimeTableActivity"
-            />
-        <activity android:name=".Ui.AddSubjectActivity"
-            />
-        <activity android:name=".Ui.DeleteSubjectActivity"
-            />
-        <activity android:name=".Ui.SettingActivity"
-            />
+        <activity android:name=".Ui.AccountActivity" />
+        <activity android:name=".Ui.TimeTableActivity" />
+        <activity android:name=".Ui.AddSubjectActivity" />
+        <activity android:name=".Ui.DeleteSubjectActivity" />
+        <activity android:name=".Ui.SettingActivity" />
     </application>
 
 </manifest>

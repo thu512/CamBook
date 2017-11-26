@@ -355,7 +355,7 @@ public class PickImagePreviewActivity extends PickPhotoPreviewActivity {
         File f = new File(path);
         f.delete();//디렉에 있는 해당 파일 삭제
         deletePhotoUrl(user.getUid(), subname, filename);
-        deleteStorage(subname, filename);//storage에 있는 해당 파일 삭제
+        //deleteStorage(subname, filename);//storage에 있는 해당 파일 삭제
 
         Toast.makeText(PickImagePreviewActivity.this, "삭제가 완료되었습니다.", Toast.LENGTH_SHORT).show();
         finish();
@@ -381,6 +381,7 @@ public class PickImagePreviewActivity extends PickPhotoPreviewActivity {
 
                 DownloadUrl du = doc.toObject(DownloadUrl.class);
                 if (du.getFileName().equals(filename)) {
+                    deleteStorage(du.getUrl());
                     db.collection("photos")
                             .document(user.getUid())
                             .collection(subject)
@@ -397,17 +398,18 @@ public class PickImagePreviewActivity extends PickPhotoPreviewActivity {
         });
     }
 
-    private void deleteStorage(String subname, String filename) {
+    private void deleteStorage(String url) {
 
 
-        StorageReference storageRef = firebaseStorage.getReferenceFromUrl("gs://cambook-31402.appspot.com/");
+        //StorageReference storageRef = firebaseStorage.getReferenceFromUrl("gs://cambook-31402.appspot.com/");
+        StorageReference storageRef2 = firebaseStorage.getReferenceFromUrl(url);
 
-        StorageReference desertRef = storageRef.child(user.getUid()).child(subname).child(filename);
+        //StorageReference desertRef = storageRef.child(user.getUid()).child(subname).child(filename);
 
-        Log.d("deleteSubject", subname);
-        Log.d("deleteFilename", filename);
+        //Log.d("deleteSubject", subname);
+        //Log.d("deleteFilename", filename);
 
-        desertRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+        storageRef2.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
                 Toast.makeText(PickImagePreviewActivity.this, "삭제 완료", Toast.LENGTH_SHORT).show();

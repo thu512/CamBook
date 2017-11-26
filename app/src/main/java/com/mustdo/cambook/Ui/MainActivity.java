@@ -217,7 +217,7 @@ public class MainActivity extends Activity {
 
             //여기서firestore에 다운로드 url저장
             insertFirestore(subject,taskSnapshot.getDownloadUrl().toString(),fileName);
-
+            //Log.d("TTT",""+taskSnapshot.getUploadSessionUri().getPath());
             U.getInstance().toast(getApplicationContext(), "업로드 성공");
         });
 
