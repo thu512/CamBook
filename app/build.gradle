@@ -1,22 +1,31 @@
 apply plugin: 'com.android.application'
 
 android {
+    signingConfigs {
+        config {
+            keyAlias 'key0'
+            keyPassword 'ckdwn123'
+            storeFile file('/Users/lcj/AndroidStudioProjects/CamBook/releaseKey')
+            storePassword 'ckdwn123'
+        }
+    }
     compileSdkVersion 26
     defaultConfig {
         applicationId "com.mustdo.cambook"
         minSdkVersion 16
         targetSdkVersion 26
-        versionCode 6
-        versionName '0.0.5'
+        versionCode 10
+        versionName '0.0.9'
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         // Enabling multidex support.
         multiDexEnabled true
-
+        signingConfig signingConfigs.config
     }
     buildTypes {
         release {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.config
         }
     }
     dataBinding {

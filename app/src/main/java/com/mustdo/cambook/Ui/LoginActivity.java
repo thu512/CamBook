@@ -207,8 +207,8 @@ public class LoginActivity extends Activity implements GoogleApiClient.OnConnect
                                             @Override
                                             public void onComplete(@NonNull Task<Void> task) {
                                                 if (task.isSuccessful()) {
-                                                    U.toast(getApplicationContext(),"인증 메일이 전송되었습니다.");
-                                               }
+                                                    U.toast(getApplicationContext(), "인증 메일이 전송되었습니다.");
+                                                }
                                             }
                                         });
                                 sweetAlertDialog.dismissWithAnimation();
@@ -253,7 +253,12 @@ public class LoginActivity extends Activity implements GoogleApiClient.OnConnect
                 .build();
 
         mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .enableAutoManage(this /* FragmentActivity */, this /* OnConnectionFailedListener */)
+                .enableAutoManage(this /* FragmentActivity */, new GoogleApiClient.OnConnectionFailedListener() {
+                    @Override
+                    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+                        U.log("구글 로그인 실패 메세지: " + connectionResult.getErrorMessage());
+                    }
+                } /* OnConnectionFailedListener */)
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build();
 
@@ -399,8 +404,8 @@ public class LoginActivity extends Activity implements GoogleApiClient.OnConnect
             U.log("" + user.getEmail());
             U.log("" + user.getUid());
             //U.log("" + user.getPhotoUrl().toString());
-            if(user.isEmailVerified()){
-                Log.d("TTT","onStart");
+            if (user.isEmailVerified()) {
+                Log.d("TTT", "onStart");
                 startActivity(new Intent(context, MainActivity.class));
                 finish();
             }
@@ -431,6 +436,7 @@ public class LoginActivity extends Activity implements GoogleApiClient.OnConnect
             } else {
 
                 U.log("google 로그인 실패\n" + result.getStatus().getStatusMessage());
+                U.log("" + result.getStatus().toString());
                 stopPd();
             }
         } else {
