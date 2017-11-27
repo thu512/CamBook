@@ -6,8 +6,8 @@ android {
         applicationId "com.mustdo.cambook"
         minSdkVersion 16
         targetSdkVersion 26
-        versionCode 5
-        versionName '0.0.4'
+        versionCode 6
+        versionName '0.0.5'
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         // Enabling multidex support.
         multiDexEnabled true

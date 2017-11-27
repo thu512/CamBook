@@ -13,6 +13,7 @@ import com.mustdo.cambook.R;
 import com.mustdo.cambook.SuperActivity.Activity;
 import com.mustdo.cambook.Util.U;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,7 +26,13 @@ public class StartActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start);
+
+        if(execCmd() || checkFile()){
+            finish();
+        }
+
         user = FirebaseAuth.getInstance();
+
 
 
         Handler handler = new Handler();
@@ -131,4 +138,34 @@ public class StartActivity extends Activity {
                 null
         );
     }
+
+
+
+    public boolean execCmd() {
+        boolean flag = false;
+        try {
+            Runtime.getRuntime().exec("su");
+            flag = true;
+        } catch(Exception e) {
+            flag = false;
+        }
+
+        return flag;
+    }
+
+    public boolean checkFile() {
+        String[] arrayOfString = {"/system/bin/.ext", "/system/xbin/.ext","/sbin/su","/data/data/com.noshufou.android.su",
+        "/system/app/SuperUser.apk","/system/xbin/su","/system/bin/su"};
+        int i=0;
+        while(true) {
+            if(i >= arrayOfString.length)
+                return false;
+            if(new File(arrayOfString[i]).exists())
+                return true;
+
+            i++;
+        }
+    }
+
+
 }
