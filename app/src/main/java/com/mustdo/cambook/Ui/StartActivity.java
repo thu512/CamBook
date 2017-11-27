@@ -47,7 +47,11 @@ public class StartActivity extends Activity {
     }
     public void startApp(){
         if(user.getCurrentUser()!=null){
-            startActivity(new Intent(getApplicationContext(), MainActivity.class));
+            if(user.getCurrentUser().isEmailVerified()){
+                startActivity(new Intent(getApplicationContext(), MainActivity.class));
+            }else{
+                startActivity(new Intent(getApplicationContext(), LoginActivity.class));
+            }
         }else{
             startActivity(new Intent(getApplicationContext(), LoginActivity.class));
         }

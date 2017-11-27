@@ -8,6 +8,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
@@ -25,6 +26,8 @@ import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
@@ -190,8 +193,29 @@ public class LoginActivity extends Activity implements GoogleApiClient.OnConnect
                 U.log(user.getUid());
                 U.log(user.getEmail());
                 //U.toast(LoginActivity.this, "이메일로그인 성공.");
-                startActivity(new Intent(context, MainActivity.class));
-                finish();
+                if (user.isEmailVerified()) {
+                    startActivity(new Intent(context, MainActivity.class));
+                    finish();
+                } else {
+                    U.showPopup2(LoginActivity.this,
+                            "이메일 인증",
+                            "이메일 인증 후 사용해 주세요.",
+                            "확인",
+                            sweetAlertDialog -> {
+                                user.sendEmailVerification()
+                                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<Void> task) {
+                                                if (task.isSuccessful()) {
+                                                    U.toast(getApplicationContext(),"인증 메일이 전송되었습니다.");
+                                               }
+                                            }
+                                        });
+                                sweetAlertDialog.dismissWithAnimation();
+                            }
+                    );
+                }
+
 
             } else {
                 //실패 사유 보여주기
@@ -374,9 +398,13 @@ public class LoginActivity extends Activity implements GoogleApiClient.OnConnect
             U.log("" + user.getDisplayName());
             U.log("" + user.getEmail());
             U.log("" + user.getUid());
-            U.log("" + user.getPhotoUrl().toString());
-            startActivity(new Intent(context, MainActivity.class));
-            finish();
+            //U.log("" + user.getPhotoUrl().toString());
+            if(user.isEmailVerified()){
+                Log.d("TTT","onStart");
+                startActivity(new Intent(context, MainActivity.class));
+                finish();
+            }
+
         }
 
     }
