@@ -1,7 +1,10 @@
 package com.mustdo.cambook.Ui;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -17,6 +20,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import cn.pedant.SweetAlert.SweetAlertDialog;
+
 public class StartActivity extends Activity {
     FirebaseAuth user;
     private static final int MULTIPLE_PERMISSIONS = 101; //권한 동의 여부 문의 후 CallBack 함수에 쓰일 변수
@@ -27,29 +32,78 @@ public class StartActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start);
 
+
+        Boolean f1=false;
+        Boolean f2=false;
+
         if(execCmd() || checkFile()){
-            finish();
+
+            U.getInstance().showPopup3(this,
+                    "알림",
+                    "비정상적인 접근입니다.",
+                    "확인",
+                    new SweetAlertDialog.OnSweetClickListener(){
+                        @Override
+                        public void onClick(SweetAlertDialog sweetAlertDialog) {
+                            StartActivity.this.finishAffinity();
+                        }
+                    },
+                    null,
+                    null
+            );
+        }else{
+            f1=true;
         }
 
-        user = FirebaseAuth.getInstance();
+        //네트워크 연결체크
+        ConnectivityManager manager = (ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo mobile = manager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
+        NetworkInfo wifi = manager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+
+
+        // wifi 또는 모바일 네트워크 어느 하나라도 연결이 되어있다면,
+        if (wifi.isConnected() || mobile.isConnected()) {
+            //("연결됨" , "연결이 되었습니다.);
+            f2=true;
+            U.getInstance().log("네트워크 연결됨");
+        } else {
+            U.getInstance().showPopup3(this,
+                    "알림",
+                    "네트워크연결을 확인해주세요.",
+                    "확인",
+                    new SweetAlertDialog.OnSweetClickListener(){
+                        @Override
+                        public void onClick(SweetAlertDialog sweetAlertDialog) {
+                            StartActivity.this.finishAffinity();
+                        }
+                    },
+                    null,
+                    null
+            );
+
+        }
 
 
 
-        Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                if(!U.getInstance().getBoolean(StartActivity.this,"first")){
-                    U.getInstance().setBoolean(StartActivity.this,"autosave",true);
-                    U.getInstance().setBoolean(StartActivity.this,"startphoto",false);
+        if(f1 && f2){
+            user = FirebaseAuth.getInstance();
+            Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    if(!U.getInstance().getBoolean(StartActivity.this,"first")){
+                        U.getInstance().setBoolean(StartActivity.this,"autosave",true);
+                        U.getInstance().setBoolean(StartActivity.this,"startphoto",false);
+
+                    }
+                    //권한 요청 메소드
+                    checkPermissions();
+
 
                 }
-                //권한 요청 메소드
-                checkPermissions();
+            },3000);
+        }
 
-
-            }
-        },3000);
 
     }
     public void startApp(){

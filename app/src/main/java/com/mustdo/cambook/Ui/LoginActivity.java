@@ -2,23 +2,17 @@ package com.mustdo.cambook.Ui;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
+import android.util.Base64;
 import android.util.Log;
 
-import com.facebook.AccessToken;
-import com.facebook.CallbackManager;
-import com.facebook.FacebookCallback;
-import com.facebook.FacebookException;
-import com.facebook.FacebookSdk;
-import com.facebook.GraphRequest;
-import com.facebook.Profile;
-import com.facebook.login.LoginResult;
-import com.facebook.login.widget.LoginButton;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -29,7 +23,6 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
-import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
@@ -40,7 +33,8 @@ import com.mustdo.cambook.SuperActivity.Activity;
 import com.mustdo.cambook.Util.U;
 import com.mustdo.cambook.databinding.ActivityLoginBinding;
 
-import org.json.JSONException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 public class LoginActivity extends Activity implements GoogleApiClient.OnConnectionFailedListener {
 
@@ -58,15 +52,14 @@ public class LoginActivity extends Activity implements GoogleApiClient.OnConnect
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //facebook
-        FacebookSdk.sdkInitialize(getApplicationContext());
+
         binding = DataBindingUtil.setContentView(this, R.layout.activity_login);
         context = getApplicationContext();
         U = U.getInstance();
 
         firebaseAuth = FirebaseAuth.getInstance();
 
-
+        //getHash();
         // google
         initGoogleLoginInit();
 
@@ -91,34 +84,13 @@ public class LoginActivity extends Activity implements GoogleApiClient.OnConnect
         //비회원 로그인
         binding.signin.setOnClickListener((view -> anonymouslySignUp()));
 
-        //페북 로그인 버튼 누르면 프로그래스바 띄우기
-        binding.fbLoginBtn.setOnClickListener((view -> showPd()));
 
 
-        //facebook
-        callbackManager = CallbackManager.Factory.create();
-        LoginButton loginButton = binding.fbLoginBtn;
-        loginButton.setReadPermissions("email", "public_profile");
-        loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
-            @Override
-            public void onSuccess(LoginResult loginResult) {
-                U.log("FB=> 엑세스토큰: " + loginResult.getAccessToken().getToken());
-                onFaceBookInfoWithAccessToken(loginResult.getAccessToken());
-            }
-
-            @Override
-            public void onCancel() {
-                stopPd();
-            }
-
-            @Override
-            public void onError(FacebookException error) {
-                stopPd();
-            }
-        });
 
 
-        //구글 페북
+
+
+        //구글
         mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
@@ -134,7 +106,10 @@ public class LoginActivity extends Activity implements GoogleApiClient.OnConnect
         };
 
 
+
+
     }
+
 
     //익명가입 / 로그인
     public void anonymouslySignUp() {
@@ -328,68 +303,7 @@ public class LoginActivity extends Activity implements GoogleApiClient.OnConnect
     }
 
 
-    // facebook
-    CallbackManager callbackManager;
 
-    public void onFaceBookInfoWithAccessToken(final AccessToken token) {
-        AuthCredential credential = FacebookAuthProvider.getCredential(token.getToken());
-
-        mAuth.signInWithCredential(credential)
-                .addOnCompleteListener(this, task -> {
-                    if (!task.isSuccessful()) {
-                        U.log("signInWithCredential" + task.getException());
-                        U.getInstance().toast(context, "" + task.getException().getMessage());
-
-                    } else {
-                        U.log("파이어베이스 페북 로그인 완료 => 개인정보 획득");
-                        if (Profile.getCurrentProfile() != null) {
-                            U.log(" " + Profile.getCurrentProfile().getName());
-                            U.log(" " + Profile.getCurrentProfile().getLinkUri());
-                            U.log(" " + Profile.getCurrentProfile().getProfilePictureUri(100, 100));
-                            U.log(" " + Profile.getCurrentProfile().getId());
-                        }
-
-                        //개인정보 획득을위한 요청을 만듬
-                        GraphRequest request = GraphRequest.newMeRequest(token, (object, response) -> {
-                            try {
-                                U.log(" " + object.getString("email"));
-                                U.log(" " + object.getString("id"));
-                                U.log(" " + object.getString("name"));
-                                String email = object.getString("email");
-                                String name = object.getString("name");
-                                FirebaseUser user = mAuth.getCurrentUser();
-                                User u = new User(user.getUid(), null, email, name);
-
-                                //firestore 입력
-                                FirebaseFirestore db = FirebaseFirestore.getInstance();
-                                db.collection("users")
-                                        .document(user.getUid())
-                                        .set(u)
-                                        .addOnSuccessListener(aVoid -> {
-                                            //U.toast(context, "firestore ok");
-                                            stopPd();
-                                            startActivity(new Intent(context, MainActivity.class));
-                                            finish();
-                                        })
-                                        .addOnFailureListener(e -> {
-                                            stopPd();
-                                            U.toast(context, "firestone fail" + e.getMessage());
-                                        });
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                                stopPd();
-                            }
-                            U.log("" + object.toString());
-                        });
-
-                        Bundle param = new Bundle();
-                        param.putString("fields", "email,id,name");
-                        //요청 수행
-                        request.setParameters(param);
-                        request.executeAsync();
-                    }
-                });
-    }
 
 
     @Override
@@ -439,10 +353,6 @@ public class LoginActivity extends Activity implements GoogleApiClient.OnConnect
                 U.log("" + result.getStatus().toString());
                 stopPd();
             }
-        } else {
-
-            //facebook
-            callbackManager.onActivityResult(requestCode, resultCode, data);
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
@@ -479,4 +389,17 @@ public class LoginActivity extends Activity implements GoogleApiClient.OnConnect
             }
         }
     };
+
+
+    private void getHash(){
+        try{
+            PackageInfo info = getPackageManager().getPackageInfo(this.getPackageName(), PackageManager.GET_SIGNATURES);
+            for(android.content.pm.Signature signature : info.signatures){
+                MessageDigest md = MessageDigest.getInstance("SHA");
+                md.update(signature.toByteArray());
+                Log.e("TTT", Base64.encodeToString(md.digest(), Base64.DEFAULT)); }
+        }catch (PackageManager.NameNotFoundException e){
+        }catch ( NoSuchAlgorithmException e){
+        }
+    }
 }

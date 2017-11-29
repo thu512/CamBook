@@ -14,8 +14,8 @@ android {
         applicationId "com.mustdo.cambook"
         minSdkVersion 16
         targetSdkVersion 26
-        versionCode 10
-        versionName '0.0.9'
+        versionCode 11
+        versionName '0.1.0'
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         // Enabling multidex support.
         multiDexEnabled true
@@ -50,7 +50,6 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
-    implementation 'com.facebook.android:facebook-android-sdk:4.28.0'
     implementation 'com.google.android.gms:play-services-auth:11.6.0'
     implementation 'com.google.firebase:firebase-auth:11.6.0'
     implementation 'com.google.firebase:firebase-core:11.6.0'

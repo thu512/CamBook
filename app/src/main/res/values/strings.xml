@@ -2,10 +2,6 @@
 
     <string name="app_name">캠북</string>
 
-    <string name="facebook_app_id">925891344228040</string>
-    <string name="fb_login_protocol_scheme">fb925891344228040</string>
-
-
     <string name="logo">CamBook</string>
 
     <string name="photo">사진촬영</string>

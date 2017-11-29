@@ -7,7 +7,6 @@ import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.view.View;
 
-import com.facebook.login.LoginManager;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.ConnectionResult;
@@ -41,23 +40,25 @@ public class AccountActivity extends Activity implements GoogleApiClient.OnConne
         db = FirebaseFirestore.getInstance();
         firebaseAuth = FirebaseAuth.getInstance();
         user = firebaseAuth.getCurrentUser();
+        if(user!=null){
+            if (user.isAnonymous()) {
+                binding.email.setVisibility(View.VISIBLE);
+                binding.idbox.setText("비회원 입니다.");
+            } else {
+                DocumentReference userRef = db.collection("users").document(user.getUid());
+                userRef.get().addOnSuccessListener(documentSnapshots -> {
+                    if(documentSnapshots != null){
+                        User user = documentSnapshots.toObject(User.class);
+                        binding.idbox.setText("" + user.getName());
+                    }
 
-        if (user.isAnonymous()) {
-            binding.email.setVisibility(View.VISIBLE);
-            binding.idbox.setText("비회원 입니다.");
-        } else {
-            DocumentReference userRef = db.collection("users").document(user.getUid());
-            userRef.get().addOnSuccessListener(documentSnapshots -> {
-                if(documentSnapshots != null){
-                    User user = documentSnapshots.toObject(User.class);
-                    binding.idbox.setText("" + user.getName());
-                }
+                }).addOnFailureListener(e -> {
+                    U.getInstance().toast(AccountActivity.this, "" + e.getMessage());
+                });
 
-            }).addOnFailureListener(e -> {
-                U.getInstance().toast(AccountActivity.this, "" + e.getMessage());
-            });
-
+            }
         }
+
 
 
         binding.email.setOnClickListener(view -> {
@@ -70,8 +71,14 @@ public class AccountActivity extends Activity implements GoogleApiClient.OnConne
 
         binding.logout.setOnClickListener(view -> {
 
+            if(user == null){
+                Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+                finish();
+            }
 
-            if(user.isAnonymous()){
+            else if(user.isAnonymous()){
                 U.getInstance().showPopup3(AccountActivity.this,
                         "경고", "비회원 로그아웃 시 데이터가 사라집니다.",
                         "확인",(sweetAlertDialog -> {
@@ -92,7 +99,6 @@ public class AccountActivity extends Activity implements GoogleApiClient.OnConne
         //sp삭제
         U.getInstance().removeAllPreferences(this);
 
-        LoginManager.getInstance().logOut();
         Auth.GoogleSignInApi.signOut(mGoogleApiClient).setResultCallback(
                 status -> U.getInstance().log("구글 로그 아웃"));
         signOut();
@@ -163,6 +169,7 @@ public class AccountActivity extends Activity implements GoogleApiClient.OnConne
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
 
     }
+
 
 
 }
