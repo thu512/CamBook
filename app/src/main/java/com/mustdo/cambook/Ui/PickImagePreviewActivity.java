@@ -15,11 +15,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.animation.DecelerateInterpolator;
-import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.PopupMenu;
-import android.widget.PopupWindow;
-import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
@@ -62,24 +59,14 @@ public class PickImagePreviewActivity extends PickPhotoPreviewActivity {
     private ViewPager viewPager;
     private ArrayList<LargeImageView> imageViews;
     private MyToolbar myToolbar;
-    private boolean mIsHidden, misSelect;
+    private boolean mIsHidden;
     private PickData pickData;
-
     private FirebaseFirestore db;
     private FirebaseAuth firebaseAuth;
     private FirebaseStorage firebaseStorage;
     private FirebaseUser user;
-
-    private ArrayList<String> subjects;
     private ImgMoveDialog imgMoveDialog;
-
-    View popupView;
-    PopupWindow popupWindow;
-    Spinner spinner;
-    ArrayAdapter<String> adapter;
-
-    String select;
-    PopupMenu popup;
+    private PopupMenu popup;
 
 
     @Override
@@ -106,12 +93,7 @@ public class PickImagePreviewActivity extends PickPhotoPreviewActivity {
         for (int i = 0; i < 4; i++) {
             LargeImageView imageView = new LargeImageView(this);
             imageView.setEnabled(true);
-            imageView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    hideOrShowToolbar();
-                }
-            });
+            imageView.setOnClickListener(view -> hideOrShowToolbar());
             imageViews.add(imageView);
         }
         initView();
@@ -134,12 +116,7 @@ public class PickImagePreviewActivity extends PickPhotoPreviewActivity {
         myToolbar.setIconColor(pickData.getToolbarIconColor());
         myToolbar.setSelectColor(pickData.getSelectIconColor());
         myToolbar.setLeftIcon(com.werb.pickphotoview.R.mipmap.pick_ic_back);
-        myToolbar.setLeftLayoutOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finishForResult();
-            }
-        });
+        myToolbar.setLeftLayoutOnClickListener(view -> finishForResult());
 
 
         myToolbar.setRightIcon(com.mustdo.cambook.R.mipmap.ic_menu);
@@ -187,7 +164,6 @@ public class PickImagePreviewActivity extends PickPhotoPreviewActivity {
 
         viewPager = (ViewPager) findViewById(com.werb.pickphotoview.R.id.image_vp);
         int indexOf = allImagePath.indexOf(path);
-        //judgeSelect(allImagePath.get(indexOf));
         viewPager.setAdapter(new listPageAdapter());
         viewPager.setCurrentItem(indexOf);
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
@@ -201,7 +177,6 @@ public class PickImagePreviewActivity extends PickPhotoPreviewActivity {
             public void onPageSelected(int position) {
                 path = allImagePath.get(position);
                 changePage(path);
-                //judgeSelect(path);
             }
 
             @Override
@@ -271,37 +246,6 @@ public class PickImagePreviewActivity extends PickPhotoPreviewActivity {
 
     }
 
-    private void judgeSelect(final String path) {
-        int indexOf = selectImagePath.indexOf(path);
-        if (indexOf != -1) {
-            myToolbar.setRightIconDefault(com.werb.pickphotoview.R.mipmap.pick_ic_select);
-            misSelect = true;
-        } else {
-            myToolbar.setRightIcon(com.werb.pickphotoview.R.mipmap.pick_ic_un_select_black);
-            misSelect = false;
-        }
-
-        myToolbar.setRightLayoutOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (misSelect) {
-                    myToolbar.setRightIcon(com.werb.pickphotoview.R.mipmap.pick_ic_un_select_black);
-                    selectImagePath.remove(path);
-                    PickHolder.setStringPaths(selectImagePath);
-                    misSelect = false;
-                } else {
-                    if (selectImagePath.size() < pickData.getPickPhotoSize()) {
-                        myToolbar.setRightIconDefault(com.werb.pickphotoview.R.mipmap.pick_ic_select);
-                        selectImagePath.add(path);
-                        PickHolder.setStringPaths(selectImagePath);
-                        misSelect = true;
-                    } else {
-                        Toast.makeText(PickImagePreviewActivity.this, String.format(v.getContext().getString(com.werb.pickphotoview.R.string.pick_photo_size_limit), String.valueOf(pickData.getPickPhotoSize())), Toast.LENGTH_SHORT).show();
-                    }
-                }
-            }
-        });
-    }
 
     @Override
     public void onBackPressed() {
@@ -355,18 +299,12 @@ public class PickImagePreviewActivity extends PickPhotoPreviewActivity {
         File f = new File(path);
         f.delete();//디렉에 있는 해당 파일 삭제
         deletePhotoUrl(user.getUid(), subname, filename);
-        //deleteStorage(subname, filename);//storage에 있는 해당 파일 삭제
 
         Toast.makeText(PickImagePreviewActivity.this, "삭제가 완료되었습니다.", Toast.LENGTH_SHORT).show();
         finish();
         Intent intent = new Intent(PickImagePreviewActivity.this, PickPhotoActivity.class);
 
-        //intent.setFlags(Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
         intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        //intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        //intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-        //intent.setFlags(Intent.FLAG_ACTIVITY_PREVIOUS_IS_TOP);
-
 
         startActivity(intent);
     }
@@ -399,16 +337,7 @@ public class PickImagePreviewActivity extends PickPhotoPreviewActivity {
     }
 
     private void deleteStorage(String url) {
-
-
-        //StorageReference storageRef = firebaseStorage.getReferenceFromUrl("gs://cambook-31402.appspot.com/");
         StorageReference storageRef2 = firebaseStorage.getReferenceFromUrl(url);
-
-        //StorageReference desertRef = storageRef.child(user.getUid()).child(subname).child(filename);
-
-        //Log.d("deleteSubject", subname);
-        //Log.d("deleteFilename", filename);
-
         storageRef2.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
@@ -432,11 +361,17 @@ public class PickImagePreviewActivity extends PickPhotoPreviewActivity {
             firebase 과목 리스트 불러와서 스피너로 선택
        */
         String subject = subname;     //이동할 과목 앨범
+        if(subject.equals("")){
+            return;
+        }
         String filename = getIntent().getStringExtra(PickConfig.INTENT_DIR_NAME); //IMG_2017_11_25_12_35_08.jpg
         String[] subjects = path.split("/");
 
         String subnm = subjects[subjects.length - 2]; //기존 과목
         Log.d("TTT",subnm+" / "+subject+" / "+filename);
+        if(subnm.equals(subject)){
+            return;
+        }
         //firestore에 파일 삭제 후 새로운 path로 다시 저장
         movePhotoUrl(subnm,subject,filename);
 
@@ -459,6 +394,8 @@ public class PickImagePreviewActivity extends PickPhotoPreviewActivity {
     }
 
     public void movePhotoUrl(String subject, String newSubject, String filename) {
+
+
         CollectionReference colRef = db.collection("photos")
                 .document(user.getUid())
                 .collection(subject);
