@@ -38,6 +38,8 @@
     <string name="logout">로그아웃</string>
     <string name="unregister">이메일 회원으로 전환</string>
     <string name="set10">버전 정보</string>
+    <string name="sound">카메라 무음</string>
+
 
     <!--이미지 옵션메뉴-->
     <string name="menu_edit">편집</string>

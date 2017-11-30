@@ -94,7 +94,7 @@ public class StartActivity extends Activity {
                     if(!U.getInstance().getBoolean(StartActivity.this,"first")){
                         U.getInstance().setBoolean(StartActivity.this,"autosave",true);
                         U.getInstance().setBoolean(StartActivity.this,"startphoto",false);
-
+                        U.getInstance().setBoolean(StartActivity.this,"sound",false);
                     }
                     //권한 요청 메소드
                     checkPermissions();
@@ -108,7 +108,10 @@ public class StartActivity extends Activity {
     }
     public void startApp(){
         if(user.getCurrentUser()!=null){
-            if(user.getCurrentUser().isEmailVerified()){
+            if(user.getCurrentUser().isAnonymous()){
+                startActivity(new Intent(getApplicationContext(), MainActivity.class));
+            }
+            else if(user.getCurrentUser().isEmailVerified()){
                 startActivity(new Intent(getApplicationContext(), MainActivity.class));
             }else{
                 startActivity(new Intent(getApplicationContext(), LoginActivity.class));

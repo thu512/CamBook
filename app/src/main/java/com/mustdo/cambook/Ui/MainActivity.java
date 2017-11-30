@@ -1,12 +1,15 @@
 package com.mustdo.cambook.Ui;
 
+import android.content.Context;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
+import android.media.AudioManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -28,6 +31,8 @@ import com.sandrios.sandriosCamera.internal.configuration.CameraConfiguration;
 import com.werb.pickphotoview.util.PickConfig;
 
 import java.io.File;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 
 public class MainActivity extends Activity {
@@ -37,11 +42,15 @@ public class MainActivity extends Activity {
     private FirebaseAuth firebaseAuth;
     private FirebaseUser user;
     private FirebaseStorage firebaseStorage;
-
+    AudioManager audioManager;
+    Class var4;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
+        audioManager = (AudioManager) this.getSystemService(Context.AUDIO_SERVICE);
+
+        var4 = audioManager.getClass();
 
         firebaseAuth = FirebaseAuth.getInstance();
         user = firebaseAuth.getCurrentUser();
@@ -90,6 +99,49 @@ public class MainActivity extends Activity {
         binding.btn4.setOnClickListener(view -> startActivity(new Intent(getApplicationContext(), SettingActivity.class)));
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        try {
+            Method var8 = var4.getMethod("setMasterMute", Boolean.TYPE, Integer.TYPE);
+            Boolean var9 = new Boolean(U.getInstance().getBoolean(MainActivity.this, "sound"));
+            Integer var10 = new Integer(0);
+            var8.invoke(this.audioManager, var9, var10);
+        } catch (NoSuchMethodException var5) {
+            Log.d("TTT", "5" + var5.getLocalizedMessage());
+            var5.printStackTrace();
+        } catch (InvocationTargetException var6) {
+            Log.d("TTT", "6" + var6.getLocalizedMessage());
+            var6.printStackTrace();
+        } catch (IllegalAccessException var7) {
+            Log.d("TTT", "7" + var7.getLocalizedMessage());
+            var7.printStackTrace();
+        }
+
+    }
+
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        try {
+            Method var8 = var4.getMethod("setMasterMute", Boolean.TYPE, Integer.TYPE);
+            Boolean var9 = new Boolean(false);
+            Integer var10 = new Integer(0);
+            var8.invoke(this.audioManager, var9, var10);
+        } catch (NoSuchMethodException var5) {
+            Log.d("TTT", "5" + var5.getLocalizedMessage());
+            var5.printStackTrace();
+        } catch (InvocationTargetException var6) {
+            Log.d("TTT", "6" + var6.getLocalizedMessage());
+            var6.printStackTrace();
+        } catch (IllegalAccessException var7) {
+            Log.d("TTT", "7" + var7.getLocalizedMessage());
+            var7.printStackTrace();
+        }
+    }
 
     // showImagePicker is boolean value: Default is true
     private void launchCamera() {
@@ -132,10 +184,10 @@ public class MainActivity extends Activity {
 
 
         //앨범
-        if(resultCode == 0){
+        if (resultCode == 0) {
             return;
         }
-        if(data == null){
+        if (data == null) {
             return;
         }
         if (requestCode == PickConfig.PICK_PHOTO_DATA) {
@@ -186,7 +238,7 @@ public class MainActivity extends Activity {
             U.getInstance().moveFile(filePath, mediaStorageDir.getPath(), fileName);
 
             //firestorage에 저장
-            uploadStorage( mediaStorageDir.getPath() + "/" + fileName, fileName, result);
+            uploadStorage(mediaStorageDir.getPath() + "/" + fileName, fileName, result);
 
             stopPd();
         }).addOnFailureListener(e -> {
@@ -216,7 +268,7 @@ public class MainActivity extends Activity {
         }).addOnSuccessListener(taskSnapshot -> {
 
             //여기서firestore에 다운로드 url저장
-            insertFirestore(subject,taskSnapshot.getDownloadUrl().toString(),fileName);
+            insertFirestore(subject, taskSnapshot.getDownloadUrl().toString(), fileName);
             //Log.d("TTT",""+taskSnapshot.getUploadSessionUri().getPath());
             U.getInstance().toast(getApplicationContext(), "업로드 성공");
         });
@@ -225,7 +277,7 @@ public class MainActivity extends Activity {
 
     //firestore 입력
     public void insertFirestore(String subject, String url, String fileName) {
-        DownloadUrl d = new DownloadUrl(url,fileName);
+        DownloadUrl d = new DownloadUrl(url, fileName);
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("photos").document(user.getUid()).collection(subject)

@@ -35,6 +35,11 @@ public class SettingActivity extends AppCompatActivity {
         }else{
             binding.luchSetSwt.setChecked(false);
         }
+        if(U.getInstance().getBoolean(this,"sound")){
+            binding.sound.setChecked(true);
+        }else{
+            binding.sound.setChecked(false);
+        }
 
 
         binding.luchSetSwt.setOnCheckedChangeListener((compoundButton, b) -> {
@@ -44,6 +49,16 @@ public class SettingActivity extends AppCompatActivity {
             } else {
                 U.getInstance().setBoolean(this, "startphoto", false);
                 binding.luchSetSwt.setChecked(false);
+            }
+        });
+
+        binding.sound.setOnCheckedChangeListener((compoundButton, b) -> {
+            if (b) {
+                U.getInstance().setBoolean(this, "sound", true);
+                binding.sound.setChecked(true);
+            } else {
+                U.getInstance().setBoolean(this, "sound", false);
+                binding.sound.setChecked(false);
             }
         });
 

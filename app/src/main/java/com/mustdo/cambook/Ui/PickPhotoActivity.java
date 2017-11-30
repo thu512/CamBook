@@ -13,10 +13,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
 import android.view.Window;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -79,7 +77,6 @@ public class PickPhotoActivity extends AppCompatActivity {
 
         initToolbar();
         initRecyclerView();
-        initSelectLayout();
         PickPhotoActivity.this.startPhotoListActivity();
 
     }
@@ -217,10 +214,6 @@ public class PickPhotoActivity extends AppCompatActivity {
     }
 
 
-    private void initSelectLayout() {
-        LinearLayout selectLayout = (LinearLayout) findViewById(R.id.select_layout);
-        selectLayout.setVisibility(View.VISIBLE);
-    }
 
     public void updateSelectText(String selectSize) {
         if (selectSize.equals("0")) {

@@ -133,6 +133,7 @@ public class PickGridAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             ImageView gridImage = (ImageView) itemView.findViewById(com.werb.pickphotoview.R.id.iv_grid);
             selectImage = (ImageView) itemView.findViewById(com.werb.pickphotoview.R.id.iv_select);
             selectLayout = (FrameLayout) itemView.findViewById(com.werb.pickphotoview.R.id.frame_select_layout);
+            selectLayout.setVisibility(View.GONE);
             RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) gridImage.getLayoutParams();
             params.width = scaleSize;
             params.height = scaleSize;
