@@ -264,7 +264,7 @@ public class MainActivity extends Activity {
         }).addOnPausedListener(taskSnapshot -> {
             U.getInstance().log("Upload is paused");
         }).addOnFailureListener(e -> {
-            U.getInstance().log("" + e.getMessage());
+            U.getInstance().log("firestorage 업로드 실패 " + e.getMessage());
         }).addOnSuccessListener(taskSnapshot -> {
 
             //여기서firestore에 다운로드 url저장

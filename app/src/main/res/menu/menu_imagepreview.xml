@@ -28,6 +28,11 @@
         android:orderInCategory="2"
         app:showAsAction="never"
         android:title="@string/menu_delete"/>
+    <item
+        android:id="@+id/menu_share"
+        android:orderInCategory="3"
+        app:showAsAction="never"
+        android:title="@string/menu_share"/>
     <!--<item-->
         <!--android:id="@+id/menu_save"-->
         <!--android:orderInCategory="3"-->

@@ -30,6 +30,15 @@
                 android:resource="@xml/pick_file_paths"/>
         </provider>
 
+        <provider android:name="android.support.v4.content.FileProvider"
+            android:grantUriPermissions="true"
+            android:exported="false"
+            android:authorities="${applicationId}.fileprovider">
+
+            <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/provider_paths"/>
+
+        </provider>
+
         <activity android:name=".Ui.StartActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

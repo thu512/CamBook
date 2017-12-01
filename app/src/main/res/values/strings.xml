@@ -52,6 +52,8 @@
 
     <string name="cancel">취소</string>
     <string name="submit">확인</string>
+    <string name="menu_share">공유</string>
+
 
     <!--비밀번호 찾기-->
     <string name="findpw">비밀번호 찾기</string>

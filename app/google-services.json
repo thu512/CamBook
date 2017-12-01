@@ -1,0 +1,77 @@
+{
+  "project_info": {
+    "project_number": "397639391103",
+    "firebase_url": "https://cambook-31402.firebaseio.com",
+    "project_id": "cambook-31402",
+    "storage_bucket": "cambook-31402.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:397639391103:android:6c8060cc9e054e2d",
+        "android_client_info": {
+          "package_name": "com.mustdo.cambook"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "397639391103-0ab3s4jaae8g9k669nmqr9n9qq7na2ke.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.mustdo.cambook",
+            "certificate_hash": "6a57b1d7ec6c44015927006324eef2f9f64b029b"
+          }
+        },
+        {
+          "client_id": "397639391103-va7tnubjthussr5a9gfqha4vrjpuaobb.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.mustdo.cambook",
+            "certificate_hash": "d80abf99c5a42999055f24b9ab7ed10ca80ebb0e"
+          }
+        },
+        {
+          "client_id": "397639391103-1uq1k0eqri7hfvmc01t9b8ej2nk48ffv.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.mustdo.cambook",
+            "certificate_hash": "efcdb1859858c53f1e94ca77c8927159a5f01890"
+          }
+        },
+        {
+          "client_id": "397639391103-tq26ll9p0jqncc0gvcl30su7krjabtok.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDETdEzpEILfKeDN0uqLwJzCgA-GB4sqlw"
+        },
+        {
+          "current_key": "AIzaSyCMOlWJKOZkn3dXebjYcSstxv0VU2_bzTU"
+        },
+        {
+          "current_key": "AIzaSyAewfVpBnByphMxgOBiKTCmYFaBlyMZLuc"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "397639391103-tq26ll9p0jqncc0gvcl30su7krjabtok.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

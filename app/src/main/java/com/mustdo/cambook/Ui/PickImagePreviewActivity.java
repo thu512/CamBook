@@ -2,10 +2,12 @@ package com.mustdo.cambook.Ui;
 
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.NonNull;
+import android.support.v4.content.FileProvider;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
@@ -38,6 +40,7 @@ import com.shizhefei.view.largeimage.factory.FileBitmapDecoderFactory;
 import com.werb.pickphotoview.PickPhotoPreviewActivity;
 import com.werb.pickphotoview.model.PickData;
 import com.werb.pickphotoview.model.PickHolder;
+import com.werb.pickphotoview.provider.PickProvider;
 import com.werb.pickphotoview.util.PickConfig;
 import com.werb.pickphotoview.widget.MyToolbar;
 
@@ -152,6 +155,9 @@ public class PickImagePreviewActivity extends PickPhotoPreviewActivity {
 
                                     });
                             imgMoveDialog.show();
+                            return true;
+                        case R.id.menu_share:
+                            shareImage();
                             return true;
                     }
                     return true;
@@ -381,9 +387,6 @@ public class PickImagePreviewActivity extends PickPhotoPreviewActivity {
         //사진을 해당 과목 으로 이동
         U.getInstance().moveFile(path, mediaStorageDir.getPath(), filename);
 
-
-
-
         Toast.makeText(PickImagePreviewActivity.this, "사진을 이동하였습니다.", Toast.LENGTH_SHORT).show();
         finish();
         Intent intent = new Intent(PickImagePreviewActivity.this, PickPhotoActivity.class);
@@ -430,6 +433,21 @@ public class PickImagePreviewActivity extends PickPhotoPreviewActivity {
                 }
             }
         });
+    }
+
+
+    public void shareImage(){
+        File f = new File(path);
+
+        Uri mSaveImagUri = FileProvider.getUriForFile(this, getApplicationContext().getPackageName()+".fileprovider",f);
+
+
+        Intent intent = new Intent(Intent.ACTION_SEND);
+        intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+        intent.setType("image/jpg");
+        intent.putExtra(Intent.EXTRA_STREAM,mSaveImagUri);
+        startActivity(Intent.createChooser(intent,"사진 공유하기"));
     }
 
 }

@@ -1,14 +1,12 @@
 package com.mustdo.cambook.Util;
 
+import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.media.ExifInterface;
-import android.util.Base64;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -18,9 +16,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.security.Signature;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -34,7 +29,7 @@ import cn.pedant.SweetAlert.SweetAlertDialog;
  * Created by Changjoo on 2017-09-16.
  */
 
-public class U {
+public class U extends Application{
     private static final U ourInstance = new U();
 
     public static U getInstance() {
@@ -155,7 +150,7 @@ public class U {
 
 
     public void log(String msg){
-        Log.d("TTT",""+msg);
+        //Log.d("TTT",""+msg);
     }
 
 
@@ -191,14 +186,15 @@ public class U {
 
             // delete the original file
             new File(inputFile).delete();
-
-
+            toast(getApplicationContext(), "앨범에 저장되었습니다.");
         }
 
         catch (FileNotFoundException fnfe1) {
+            toast(getApplicationContext(), "사진 저장실패.");
             Log.e("tag", fnfe1.getMessage());
         }
         catch (Exception e) {
+            toast(getApplicationContext(), "사진 저장실패.");
             Log.e("tag", e.getMessage());
         }
 

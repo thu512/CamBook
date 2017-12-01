@@ -110,9 +110,14 @@ public class StartActivity extends Activity {
         if(user.getCurrentUser()!=null){
             if(user.getCurrentUser().isAnonymous()){
                 startActivity(new Intent(getApplicationContext(), MainActivity.class));
+
+
+
             }
             else if(user.getCurrentUser().isEmailVerified()){
                 startActivity(new Intent(getApplicationContext(), MainActivity.class));
+
+
             }else{
                 startActivity(new Intent(getApplicationContext(), LoginActivity.class));
             }
