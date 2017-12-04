@@ -3,10 +3,13 @@ package com.mustdo.cambook.Util;
 import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.media.ExifInterface;
+import android.net.Uri;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -150,7 +153,7 @@ public class U extends Application{
 
 
     public void log(String msg){
-        //Log.d("TTT",""+msg);
+        Log.d("TTT",""+msg);
     }
 
 
@@ -186,15 +189,14 @@ public class U extends Application{
 
             // delete the original file
             new File(inputFile).delete();
-            toast(getApplicationContext(), "앨범에 저장되었습니다.");
         }
 
         catch (FileNotFoundException fnfe1) {
-            toast(getApplicationContext(), "사진 저장실패.");
+            //toast(getApplicationContext(), "사진 저장실패.");
             Log.e("tag", fnfe1.getMessage());
         }
         catch (Exception e) {
-            toast(getApplicationContext(), "사진 저장실패.");
+            //toast(getApplicationContext(), "사진 저장실패.");
             Log.e("tag", e.getMessage());
         }
 
@@ -313,6 +315,16 @@ public class U extends Application{
         }
     }
 
-
+    public static Uri convertContentToFileUri(Context ctx, Uri uri) throws Exception {
+        Cursor cursor = null;
+        try {
+            cursor = ctx.getContentResolver().query(uri, null, null, null, null);
+            cursor.moveToNext();
+            return Uri.fromFile(new File(cursor.getString(cursor.getColumnIndex(MediaStore.MediaColumns.DATA))));
+        } finally {
+            if(cursor != null)
+                cursor.close();
+        }
+    }
 
 }
