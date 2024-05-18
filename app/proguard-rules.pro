@@ -110,3 +110,33 @@
   public *;
 }
 -dontwarn android.support.v4.**,org.slf4j.**,com.google.android.gms.**
+
+-keep public class com.fsn.cauly.** {
+	 	   public protected *;
+	}
+	-keep public class com.trid.tridad.** {
+	  	  public protected *;
+	}
+	-dontwarn android.webkit.**
+
+
+    -keep public class com.fsn.cauly.** {
+          public protected *;
+    }
+    -keep public class com.trid.tridad.** {
+      	  public protected *;
+    }
+    -dontwarn android.webkit.**
+
+
+    -keep class com.fsn.cauly.** {
+    	   public *; protected *;
+    }
+    -keep class com.trid.tridad.** {
+      	  public *; protected *;
+    }
+    -dontwarn android.webkit.**
+
+    -dontwarn com.squareup.okhttp.CipherSuite
+    -dontwarn com.squareup.okhttp.ConnectionSpec
+    -dontwarn com.squareup.okhttp.TlsVersion

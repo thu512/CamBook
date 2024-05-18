@@ -2,7 +2,7 @@ package com.mustdo.cambook.Ui;
 
 import android.content.Context;
 import android.content.Intent;
-import android.databinding.DataBindingUtil;
+import androidx.databinding.DataBindingUtil;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Environment;
@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.crash.FirebaseCrash;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -173,6 +174,8 @@ public class TimeTableActivity extends Activity {
             stopPd();
         }).addOnFailureListener(e -> {
             U.getInstance().toast(TimeTableActivity.this, "" + e.getMessage());
+            FirebaseCrash.log("백업 사진 가져오기 에러: "+e.getLocalizedMessage());
+            FirebaseCrash.log("백업 사진 가져오기 에러: "+e.getMessage());
             stopPd();
         });
     }
@@ -273,6 +276,8 @@ public class TimeTableActivity extends Activity {
 
         }).addOnFailureListener(e -> {
             U.getInstance().toast(TimeTableActivity.this, "" + e.getMessage());
+            FirebaseCrash.log("백업 사진 가져오기 에러(storage): "+e.getLocalizedMessage());
+            FirebaseCrash.log("백업 사진 가져오기 에러(storage): "+e.getMessage());
             stopPd();
         });
 
@@ -300,6 +305,8 @@ public class TimeTableActivity extends Activity {
 
         }).addOnFailureListener(e -> {
             U.getInstance().log(""+e.getMessage());
+            FirebaseCrash.log("사진 저장 에러(시간표): "+e.getMessage());
+            FirebaseCrash.log("사진 저장 에러(시간표): "+e.getLocalizedMessage());
         });
 
     }

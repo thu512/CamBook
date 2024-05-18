@@ -8,8 +8,7 @@
         android:layout_height="match_parent"
         android:background="#ffffff"
         android:paddingBottom="@dimen/activity_vertical_margin"
-        android:paddingLeft="@dimen/activity_horizontal_margin"
-        android:paddingRight="@dimen/activity_horizontal_margin"
+
         android:paddingTop="@dimen/activity_vertical_margin"
         tools:context="com.mustdo.cambook.Ui.MainActivity">
 
@@ -82,6 +81,22 @@
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
             android:layout_alignParentTop="true"
+            android:layout_marginEnd="17dp"
+            android:layout_marginRight="17dp"
             android:background="@mipmap/btn5" />
+
+
+        <com.fsn.cauly.CaulyAdView
+            xmlns:app="http://schemas.android.com/apk/res/com.mustdo.cambook"
+            android:id="@+id/xmladview"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            app:appcode="T6vTqyR0"
+            app:effect="RightSlide"
+            app:dynamicReloadInterval="true"
+            app:reloadInterval="20"
+            app:bannerHeight="Fixed"
+            />
     </RelativeLayout>
 </layout>

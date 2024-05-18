@@ -3,12 +3,18 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.mustdo.cambook">
 
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
+
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="com.google.android.gms.permission.AD_ID"/>
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
 
     <application
@@ -18,7 +24,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Design.Light.NoActionBar"
         tools:replace="android:icon,android:allowBackup"
-        >
+        android:usesCleartextTraffic="true">
 
         <provider
             android:name="com.werb.pickphotoview.provider.PickProvider"
@@ -27,19 +33,26 @@
             android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/pick_file_paths"/>
+                android:resource="@xml/pick_file_paths" />
         </provider>
 
-        <provider android:name="android.support.v4.content.FileProvider"
-            android:grantUriPermissions="true"
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
             android:exported="false"
-            android:authorities="${applicationId}.fileprovider">
+            android:grantUriPermissions="true">
 
-            <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/provider_paths"/>
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/provider_paths" />
 
         </provider>
 
-        <activity android:name=".Ui.StartActivity">
+        <activity
+            android:name=".Ui.StartActivity"
+            android:screenOrientation="portrait"
+            android:exported="true">
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -47,30 +60,66 @@
             </intent-filter>
 
             <intent-filter>
-                <action android:name="android.intent.action.SEND"/>
-                <category android:name="android.intent.category.DEFAULT"/>
-                <data android:mimeType="image/jpeg"/>
-                <data android:mimeType="image/png"/>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data android:mimeType="image/jpeg" />
+                <data android:mimeType="image/png" />
             </intent-filter>
             <intent-filter>
-                <action android:name="android.intent.action.SEND_MULTIPLE"/>
-                <category android:name="android.intent.category.DEFAULT"/>
-                <data android:mimeType="image/jpeg"/>
-                <data android:mimeType="image/png"/>
+                <action android:name="android.intent.action.SEND_MULTIPLE" />
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data android:mimeType="image/jpeg" />
+                <data android:mimeType="image/png" />
             </intent-filter>
 
         </activity>
-        <activity android:name=".Ui.MainActivity" />
-        <activity android:name=".Ui.LoginActivity" />
-        <activity android:name=".Ui.JoinActivity" />
-        <activity android:name=".Ui.FindPwdActivity" />
-        <activity android:name=".Ui.PickImagePreviewActivity"/>
-        <activity android:name=".Ui.PickPhotoActivity"/>
-        <activity android:name=".Ui.AccountActivity" />
-        <activity android:name=".Ui.TimeTableActivity" />
-        <activity android:name=".Ui.AddSubjectActivity" />
-        <activity android:name=".Ui.DeleteSubjectActivity" />
-        <activity android:name=".Ui.SettingActivity" />
+        <activity
+            android:name=".Ui.MainActivity"
+            android:screenOrientation="portrait"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
+            android:exported="true" />
+        <activity
+            android:name=".Ui.LoginActivity"
+            android:screenOrientation="portrait"
+            android:exported="false" />
+        <activity
+            android:name=".Ui.JoinActivity"
+            android:screenOrientation="portrait"
+            android:exported="false" />
+        <activity
+            android:name=".Ui.FindPwdActivity"
+            android:screenOrientation="portrait"
+            android:exported="false" />
+        <activity
+            android:name=".Ui.PickImagePreviewActivity"
+            android:screenOrientation="portrait"
+            android:exported="false" />
+        <activity
+            android:name=".Ui.PickPhotoActivity"
+            android:screenOrientation="portrait"
+            android:exported="false" />
+        <activity
+            android:name=".Ui.AccountActivity"
+            android:screenOrientation="portrait"
+            android:exported="false" />
+        <activity
+            android:name=".Ui.TimeTableActivity"
+            android:screenOrientation="portrait"
+            android:exported="false" />
+        <activity
+            android:name=".Ui.AddSubjectActivity"
+            android:screenOrientation="portrait"
+            android:exported="false" />
+        <activity
+            android:name=".Ui.DeleteSubjectActivity"
+            android:screenOrientation="portrait"
+            android:exported="false" />
+        <activity
+            android:name=".Ui.SettingActivity"
+            android:screenOrientation="portrait"
+            android:exported="false" />
     </application>
 
 </manifest>

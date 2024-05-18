@@ -3,17 +3,20 @@ package com.mustdo.cambook.Ui;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.media.ExifInterface;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
-import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
+
+import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.crash.FirebaseCrash;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -40,7 +43,7 @@ import cn.pedant.SweetAlert.SweetAlertDialog;
 public class StartActivity extends Activity {
     FirebaseAuth user;
     private static final int MULTIPLE_PERMISSIONS = 101; //권한 동의 여부 문의 후 CallBack 함수에 쓰일 변수
-    private String[] permissions = {android.Manifest.permission.READ_EXTERNAL_STORAGE, android.Manifest.permission.WRITE_EXTERNAL_STORAGE, android.Manifest.permission.CAMERA};
+    private String[] permissions = {android.Manifest.permission.CAMERA, android.Manifest.permission.READ_PHONE_STATE};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,27 +51,27 @@ public class StartActivity extends Activity {
         setContentView(R.layout.activity_start);
 
 
-        Boolean f1 = true;  //바꿔주기
+        Boolean f1 = false;  //바꿔주기
         Boolean f2 = false;
 
-//        if(execCmd() || checkFile()){
-//
-//            U.getInstance().showPopup3(this,
-//                    "알림",
-//                    "비정상적인 접근입니다.",
-//                    "확인",
-//                    new SweetAlertDialog.OnSweetClickListener(){
-//                        @Override
-//                        public void onClick(SweetAlertDialog sweetAlertDialog) {
-//                            StartActivity.this.finishAffinity();
-//                        }
-//                    },
-//                    null,
-//                    null
-//            );
-//        }else{
-//            f1=true;
-//        }
+        if (execCmd() || checkFile()) {
+
+            U.getInstance().showPopup3(this,
+                    "알림",
+                    "비정상적인 접근입니다.",
+                    "확인",
+                    new SweetAlertDialog.OnSweetClickListener() {
+                        @Override
+                        public void onClick(SweetAlertDialog sweetAlertDialog) {
+                            StartActivity.this.finishAffinity();
+                        }
+                    },
+                    null,
+                    null
+            );
+        } else {
+            f1 = true;
+        }
 
 
         //네트워크 연결체크
@@ -165,6 +168,7 @@ public class StartActivity extends Activity {
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         boolean f1 = true;
         boolean f2 = true;
         boolean f3 = true;
@@ -186,20 +190,13 @@ public class StartActivity extends Activity {
                             } else {
                                 f2 = true;
                             }
-                        } else if (permissions[i].equals(this.permissions[2])) {
-                            if (grantResults[i] != PackageManager.PERMISSION_GRANTED) {
-                                popup();
-                                f3 = false;
-                            } else {
-                                f3 = true;
-                            }
                         }
                     }
                 } else {
                     popup();
                 }
 
-                if (f1 && f2 && f3) {
+                if (f1 && f2) {
                     startApp();
                 }
                 return;
@@ -272,80 +269,48 @@ public class StartActivity extends Activity {
                     inputStream = getContentResolver().openInputStream(u);
 
 
-                    String[] fileArray = u.getPath().split("/");
+                    ExifInterface exif = new ExifInterface(u.getPath());
 
-                    String filename = fileArray[fileArray.length - 1];
+                    U.getInstance().log("" + exif.getAttribute(ExifInterface.TAG_DATETIME));
 
-                    U.getInstance().log("uri: " + filename);
-
-                    String date = filename.split("_")[1];
-                    date += filename.split("_")[2].substring(0, 6);
-                    String tm = filename.split("_")[2].substring(0, 2);
-                    SimpleDateFormat old = new SimpleDateFormat("yyyyMMddHHmmss");
-                    SimpleDateFormat new_date = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss");
-                    Date d = old.parse(date);
-
-                    String date_new = new_date.format(d);
-
-                    U.getInstance().log("date: " + date);
-
-                    String day = U.getInstance().getDateDay(filename.split("_")[1]);
-                    U.getInstance().log("day: " + day);
+                    //사진파일의 exif정보가 있을때
+                    if (exif.getAttribute(ExifInterface.TAG_DATETIME) != null) {
+                        String date = exif.getAttribute(ExifInterface.TAG_DATETIME);
 
 
-                    int time = Integer.parseInt(tm) - 8;
-                    U.getInstance().log("시간: "+time);
-                    FirebaseFirestore db  = FirebaseFirestore.getInstance();
+                        SimpleDateFormat old = new SimpleDateFormat("yyyy:MM:dd HH:mm:ss");
+                        SimpleDateFormat new_date = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss");
+                        Date d = old.parse(date);
 
-                    //firestore에서 불러와서 과목 시간들과 바로 비교
-                    CollectionReference colRef = db.collection("timeTables").document(user.getUid()).collection("subjects");
+                        String date_new = new_date.format(d);
+                        U.getInstance().log("date: " + date_new);
 
-                    colRef.get().addOnSuccessListener(documentSnapshots -> {
+                        String day = U.getInstance().getDateDay(
+                                date.split(" ")[0].split(":")[0]
+                                        + date.split(" ")[0].split(":")[1]
+                                        + date.split(" ")[0].split(":")[2]);
 
-                        String result = "기타";
-
-                        for (DocumentSnapshot doc : documentSnapshots.getDocuments()) {
-                            Subject sub = doc.toObject(Subject.class);
-                            U.getInstance().log("" + sub.toString());
-                            boolean f = false;
-                            if (day.equals(sub.getItem())) {
-                                int s_time = Integer.parseInt(sub.getS_time());
-                                int e_time = Integer.parseInt(sub.getE_time());
-                                for (int i = s_time; i <= e_time; i++) {
-                                    if (time == i) {
-                                        U.getInstance().log("" + sub.getSubject());
-                                        result = sub.getSubject();
-                                        f = true;
-                                        break;
-                                    }
-                                }
-                                if (f) break;
-                            }
-                        }
+                        U.getInstance().log("day: " + day);
 
 
-                        // 과목별 사진 저장소 path
-                        File mediaStorageDir = new File(this.getExternalFilesDir(Environment.DIRECTORY_DCIM), result);
+                        int time = Integer.parseInt(date.split(" ")[1].split(":")[0]) - 8;
+                        U.getInstance().log("시간: " + time);
 
-                        //사진 해당 과목에 저장 기타 폴더에 저장 후 -> 사진 정보 추출 과목 구한 후 -> 해당 과목으로 이동
+                        getSubject(day, time, date_new, u);
 
-                        U.getInstance().moveFile(u.getPath(), mediaStorageDir.getPath(), "IMG_" + date_new + ".jpg");
-
-                        //firestorage에 저장
-                        uploadStorage(mediaStorageDir.getPath() + "/" + "IMG_" + date_new + ".jpg", "IMG_" + date_new + ".jpg", result);
-
-
-                    }).addOnFailureListener(e -> {
-                        U.getInstance().toast(StartActivity.this, "" + e.getMessage());
-
-                    });
-
-
+                    }
+                    //사진파일의 exif정보가 없을때
+                    else {
+                        saveExternalImg(u);
+                    }
 
 
                 } catch (Exception e) {
                     U.getInstance().log("1" + e.getLocalizedMessage());
-                    U.getInstance().toast(this,"사진 가져오기에 실패하였습니다.");
+                    U.getInstance().toast(this, "사진 가져오기에 실패하였습니다.");
+                    FirebaseCrash.log("사진 가져오기 에러: " + e.getLocalizedMessage());
+                    FirebaseCrash.log("사진 가져오기 에러: " + e.getMessage());
+
                     e.printStackTrace();
                 } finally {
                     try {
@@ -360,7 +325,94 @@ public class StartActivity extends Activity {
         }
     }
 
+    //사진 가져와서 저장
+    public void saveExternalImg(Uri u) {
+        try {
+            String[] fileArray = u.getPath().split("/");
 
+            String filename = fileArray[fileArray.length - 1];
+
+            U.getInstance().log("uri: " + filename);
+
+            String date = filename.split("_")[1];
+            date += filename.split("_")[2].substring(0, 6);
+            String tm = filename.split("_")[2].substring(0, 2);
+            SimpleDateFormat old = new SimpleDateFormat("yyyyMMddHHmmss");
+            SimpleDateFormat new_date = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss");
+            Date d = old.parse(date);
+
+            String date_new = new_date.format(d);
+
+            U.getInstance().log("date: " + date);
+
+            String day = U.getInstance().getDateDay(filename.split("_")[1]);
+            U.getInstance().log("day: " + day);
+
+
+            int time = Integer.parseInt(tm) - 8;
+            U.getInstance().log("시간: " + time);
+
+            getSubject(day, time, date_new, u);
+
+        } catch (Exception e) {
+            U.getInstance().log("saveExternalImg" + e.getLocalizedMessage());
+            U.getInstance().toast(this, "사진 가져오기에 실패하였습니다.");
+            FirebaseCrash.log("사진 가져오기 에러(saveExternalImg): " + e.getLocalizedMessage());
+            FirebaseCrash.log("사진 가져오기 에러(saveExternalImg): " + e.getMessage());
+
+            e.printStackTrace();
+        }
+
+    }
+
+    //과목명 추출
+    public void getSubject(String day, int time, String date_new, Uri u) {
+
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        //firestore에서 불러와서 과목 시간들과 바로 비교
+        CollectionReference colRef = db.collection("timeTables").document(user.getUid()).collection("subjects");
+
+        colRef.get().addOnSuccessListener(documentSnapshots -> {
+
+            String result = "기타";
+
+            for (DocumentSnapshot doc : documentSnapshots.getDocuments()) {
+                Subject sub = doc.toObject(Subject.class);
+                U.getInstance().log("" + sub.toString());
+                boolean f = false;
+                if (day.equals(sub.getItem())) {
+                    int s_time = Integer.parseInt(sub.getS_time());
+                    int e_time = Integer.parseInt(sub.getE_time());
+                    for (int i = s_time; i <= e_time; i++) {
+                        if (time == i) {
+                            U.getInstance().log("" + sub.getSubject());
+                            result = sub.getSubject();
+                            f = true;
+                            break;
+                        }
+                    }
+                    if (f) break;
+                }
+            }
+
+
+            // 과목별 사진 저장소 path
+            File mediaStorageDir = new File(this.getExternalFilesDir(Environment.DIRECTORY_DCIM), result);
+
+            //사진 해당 과목에 저장 기타 폴더에 저장 후 -> 사진 정보 추출 과목 구한 후 -> 해당 과목으로 이동
+
+            U.getInstance().moveFile(u.getPath(), mediaStorageDir.getPath(), "IMG_" + date_new + ".jpg");
+
+            //firestorage에 저장
+            uploadStorage(mediaStorageDir.getPath() + "/" + "IMG_" + date_new + ".jpg", "IMG_" + date_new + ".jpg", result);
+
+
+        }).addOnFailureListener(e -> {
+            U.getInstance().toast(StartActivity.this, "" + e.getMessage());
+
+        });
+    }
 
     //firestorage에 저장
     public void uploadStorage(String filePath, String fileName, String subject) {
@@ -385,12 +437,16 @@ public class StartActivity extends Activity {
         }).addOnSuccessListener(taskSnapshot -> {
 
             //여기서firestore에 다운로드 url저장
-            insertFirestore(subject, taskSnapshot.getDownloadUrl().toString(), fileName);
-            //Log.d("TTT",""+taskSnapshot.getUploadSessionUri().getPath());
-            U.getInstance().toast(getApplicationContext(), "업로드 성공");
+            if (taskSnapshot.getMetadata() != null && taskSnapshot.getMetadata().getReference() != null) {
+                insertFirestore(subject, taskSnapshot.getMetadata().getReference().getDownloadUrl().toString(), fileName);
+                //Log.d("TTT",""+taskSnapshot.getUploadSessionUri().getPath());
+                U.getInstance().toast(getApplicationContext(), "업로드 성공");
+            }
+
         });
 
     }
+
     //firestore 입력
     public void insertFirestore(String subject, String url, String fileName) {
         DownloadUrl d = new DownloadUrl(url, fileName);

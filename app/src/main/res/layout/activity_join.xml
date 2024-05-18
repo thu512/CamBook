@@ -20,7 +20,7 @@
         android:orientation="horizontal"
         android:weightSum="100">
 
-        <android.support.v4.widget.Space
+        <androidx.legacy.widget.Space
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="5.9" />
@@ -32,7 +32,7 @@
             android:layout_weight="3.3"
             android:background="@mipmap/back_" />
 
-        <android.support.v4.widget.Space
+        <androidx.legacy.widget.Space
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="23.3" />
@@ -48,7 +48,7 @@
             android:textSize="20.3sp" />
     </LinearLayout>
 
-    <android.support.v4.widget.Space
+    <androidx.legacy.widget.Space
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="9" />
@@ -62,7 +62,7 @@
         android:orientation="horizontal">
 
 
-        <android.support.v4.widget.Space
+        <androidx.legacy.widget.Space
             android:layout_width="29dp"
             android:layout_height="match_parent" />
 
@@ -103,7 +103,7 @@
         android:orientation="horizontal">
 
 
-        <android.support.v4.widget.Space
+        <androidx.legacy.widget.Space
             android:layout_width="29dp"
             android:layout_height="match_parent" />
 
@@ -143,7 +143,7 @@
         android:orientation="horizontal"
         android:background="@drawable/white_top">
 
-        <android.support.v4.widget.Space
+        <androidx.legacy.widget.Space
             android:layout_width="29dp"
             android:layout_height="match_parent" />
         <TextView
@@ -183,7 +183,7 @@
         android:orientation="horizontal">
 
 
-        <android.support.v4.widget.Space
+        <androidx.legacy.widget.Space
             android:layout_width="29dp"
             android:layout_height="match_parent" />
 
@@ -214,7 +214,7 @@
             android:textSize="18.5sp" />
 
     </LinearLayout>
-    <android.support.v4.widget.Space
+    <androidx.legacy.widget.Space
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="44.5"

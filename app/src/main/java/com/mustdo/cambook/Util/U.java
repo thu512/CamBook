@@ -13,6 +13,8 @@ import android.provider.MediaStore;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.google.firebase.crash.FirebaseCrash;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -191,12 +193,16 @@ public class U extends Application{
             new File(inputFile).delete();
         }
 
-        catch (FileNotFoundException fnfe1) {
+        catch (FileNotFoundException e) {
             //toast(getApplicationContext(), "사진 저장실패.");
-            Log.e("tag", fnfe1.getMessage());
+            FirebaseCrash.log("사진 저장 에러(파일이동): "+e.getMessage());
+            FirebaseCrash.log("사진 저장 에러(파일이동): "+e.getLocalizedMessage());
+            Log.e("tag", e.getMessage());
         }
         catch (Exception e) {
             //toast(getApplicationContext(), "사진 저장실패.");
+            FirebaseCrash.log("사진 저장 에러(파일이동): "+e.getMessage());
+            FirebaseCrash.log("사진 저장 에러(파일이동): "+e.getLocalizedMessage());
             Log.e("tag", e.getMessage());
         }
 

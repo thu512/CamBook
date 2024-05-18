@@ -9,7 +9,7 @@
         android:orientation="vertical"
         tools:context="com.mustdo.cambook.Ui.SettingActivity"
         android:background="#ffffff">
-        <android.support.constraint.ConstraintLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/constraintLayout"
             android:layout_width="match_parent"
             android:layout_height="50dp"
@@ -40,7 +40,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-        </android.support.constraint.ConstraintLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
 
         <RelativeLayout
@@ -106,27 +106,19 @@
             android:background="@drawable/gray_ract">
 
             <TextView
+                android:id="@+id/privacy"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignBaseline="@+id/sound"
-                android:layout_alignBottom="@+id/sound"
+                android:layout_centerVertical="true"
+
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
                 android:layout_marginLeft="20dp"
                 android:layout_marginStart="20dp"
-                android:text="@string/sound"
+                android:text="@string/privacy"
                 android:textColor="#000000"
                 android:textSize="18.5sp" />
 
-            <Switch
-                android:id="@+id/sound"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_alignParentRight="true"
-                android:layout_centerVertical="true"
-                android:layout_marginEnd="30dp"
-                android:layout_marginRight="30dp" />
         </RelativeLayout>
 
         <RelativeLayout

@@ -2,7 +2,6 @@ package com.mustdo.cambook.Ui;
 
 import android.content.Context;
 import android.content.Intent;
-import android.databinding.DataBindingUtil;
 import android.media.AudioManager;
 import android.net.Uri;
 import android.os.Bundle;
@@ -10,6 +9,8 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+
+import androidx.databinding.DataBindingUtil;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -26,8 +27,10 @@ import com.mustdo.cambook.R;
 import com.mustdo.cambook.SuperActivity.Activity;
 import com.mustdo.cambook.Util.U;
 import com.mustdo.cambook.databinding.ActivityMainBinding;
-import com.sandrios.sandriosCamera.internal.SandriosCamera;
 import com.sandrios.sandriosCamera.internal.configuration.CameraConfiguration;
+import com.sandrios.sandriosCamera.internal.ui.camera.Camera1Activity;
+import com.sandrios.sandriosCamera.internal.ui.camera2.Camera2Activity;
+import com.sandrios.sandriosCamera.internal.utils.CameraHelper;
 import com.werb.pickphotoview.util.PickConfig;
 
 import java.io.File;
@@ -44,6 +47,7 @@ public class MainActivity extends Activity {
     private FirebaseStorage firebaseStorage;
     AudioManager audioManager;
     Class var4;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -99,28 +103,6 @@ public class MainActivity extends Activity {
         binding.btn4.setOnClickListener(view -> startActivity(new Intent(getApplicationContext(), SettingActivity.class)));
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        try {
-            Method var8 = var4.getMethod("setMasterMute", Boolean.TYPE, Integer.TYPE);
-            Boolean var9 = new Boolean(U.getInstance().getBoolean(MainActivity.this, "sound"));
-            Integer var10 = new Integer(0);
-            var8.invoke(this.audioManager, var9, var10);
-        } catch (NoSuchMethodException var5) {
-            Log.d("TTT", "5" + var5.getLocalizedMessage());
-            var5.printStackTrace();
-        } catch (InvocationTargetException var6) {
-            Log.d("TTT", "6" + var6.getLocalizedMessage());
-            var6.printStackTrace();
-        } catch (IllegalAccessException var7) {
-            Log.d("TTT", "7" + var7.getLocalizedMessage());
-            var7.printStackTrace();
-        }
-
-    }
-
 
     @Override
     protected void onDestroy() {
@@ -145,11 +127,20 @@ public class MainActivity extends Activity {
 
     // showImagePicker is boolean value: Default is true
     private void launchCamera() {
-        new SandriosCamera(this, CAPTURE_MEDIA)
-                .setShowPicker(false)
-                .setMediaAction(CameraConfiguration.MEDIA_ACTION_PHOTO)
-                .enableImageCropping(true) // Default is false.
-                .launchCamera();
+        if (CameraHelper.hasCamera(this)) {
+            Intent cameraIntent;
+            if (CameraHelper.hasCamera2(this)) {
+                cameraIntent = new Intent(this, Camera2Activity.class);
+            } else {
+                cameraIntent = new Intent(this, Camera1Activity.class);
+            }
+            cameraIntent.putExtra(CameraConfiguration.Arguments.REQUEST_CODE, CAPTURE_MEDIA);
+            cameraIntent.putExtra(CameraConfiguration.Arguments.SHOW_PICKER, false);
+            cameraIntent.putExtra(CameraConfiguration.Arguments.MEDIA_ACTION, CameraConfiguration.MEDIA_ACTION_PHOTO);
+            cameraIntent.putExtra(CameraConfiguration.Arguments.ENABLE_CROP, true);
+
+            this.startActivityForResult(cameraIntent, CAPTURE_MEDIA);
+        }
     }
 
     @Override
@@ -268,9 +259,11 @@ public class MainActivity extends Activity {
         }).addOnSuccessListener(taskSnapshot -> {
 
             //여기서firestore에 다운로드 url저장
-            insertFirestore(subject, taskSnapshot.getDownloadUrl().toString(), fileName);
-            //Log.d("TTT",""+taskSnapshot.getUploadSessionUri().getPath());
-            U.getInstance().toast(getApplicationContext(), "업로드 성공");
+            if (taskSnapshot.getMetadata() != null && taskSnapshot.getMetadata().getReference() != null) {
+                insertFirestore(subject, taskSnapshot.getMetadata().getReference().getDownloadUrl().toString(), fileName);
+                //Log.d("TTT",""+taskSnapshot.getUploadSessionUri().getPath());
+                U.getInstance().toast(getApplicationContext(), "업로드 성공");
+            }
         });
 
     }

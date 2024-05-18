@@ -1,7 +1,7 @@
 package com.mustdo.cambook.Ui;
 
 import android.content.Intent;
-import android.databinding.DataBindingUtil;
+import androidx.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.os.Environment;
 import android.view.View;

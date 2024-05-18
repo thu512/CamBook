@@ -6,10 +6,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.support.annotation.NonNull;
-import android.support.v4.content.FileProvider;
-import android.support.v4.view.PagerAdapter;
-import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -20,6 +16,11 @@ import android.view.animation.DecelerateInterpolator;
 import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.core.content.FileProvider;
+import androidx.viewpager.widget.PagerAdapter;
+import androidx.viewpager.widget.ViewPager;
 
 import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -40,7 +41,6 @@ import com.shizhefei.view.largeimage.factory.FileBitmapDecoderFactory;
 import com.werb.pickphotoview.PickPhotoPreviewActivity;
 import com.werb.pickphotoview.model.PickData;
 import com.werb.pickphotoview.model.PickHolder;
-import com.werb.pickphotoview.provider.PickProvider;
 import com.werb.pickphotoview.util.PickConfig;
 import com.werb.pickphotoview.widget.MyToolbar;
 
@@ -132,33 +132,31 @@ public class PickImagePreviewActivity extends PickPhotoPreviewActivity {
                 inflater.inflate(R.menu.menu_imagepreview, menu);
 
                 popup.setOnMenuItemClickListener(menuItem -> {
-                    switch (menuItem.getItemId()) {
+                    int itemId = menuItem.getItemId();
+                    if (itemId == R.id.menu_delete) {
+                        U.getInstance().showPopup3(PickImagePreviewActivity.this,
+                                "경고", "삭제한 데이터는 다시 복구할 수 없습니다.",
+                                "확인", (sweetAlertDialog -> {
+                                    sweetAlertDialog.dismissWithAnimation();
+                                    imageDelete();//디렉 사진 삭제, firebase 파일 삭제
+                                }),
+                                "취소", sweetAlertDialog -> sweetAlertDialog.dismissWithAnimation());
+                        return true;
+                    } else if (itemId == R.id.menu_move) {
+                        imgMoveDialog = new ImgMoveDialog(PickImagePreviewActivity.this,
+                                view1 -> {
+                                },
+                                view1 -> {
 
-                        case R.id.menu_delete:
-                            U.getInstance().showPopup3(PickImagePreviewActivity.this,
-                                    "경고", "삭제한 데이터는 다시 복구할 수 없습니다.",
-                                    "확인", (sweetAlertDialog -> {
-                                        sweetAlertDialog.dismissWithAnimation();
-                                        imageDelete();//디렉 사진 삭제, firebase 파일 삭제
-                                    }),
-                                    "취소", sweetAlertDialog -> sweetAlertDialog.dismissWithAnimation());
-                            return true;
+                                    imageMove(imgMoveDialog.getSelect());
+                                    imgMoveDialog.dismiss();
 
-                        case R.id.menu_move:
-                            imgMoveDialog = new ImgMoveDialog(PickImagePreviewActivity.this,
-                                    view1 -> {
-                                    },
-                                    view1 -> {
-
-                                        imageMove(imgMoveDialog.getSelect());
-                                        imgMoveDialog.dismiss();
-
-                                    });
-                            imgMoveDialog.show();
-                            return true;
-                        case R.id.menu_share:
-                            shareImage();
-                            return true;
+                                });
+                        imgMoveDialog.show();
+                        return true;
+                    } else if (itemId == R.id.menu_share) {
+                        shareImage();
+                        return true;
                     }
                     return true;
                 });
