@@ -1,11 +1,12 @@
 package com.mustdo.cambook.Ui;
 
 import android.content.Intent;
-import androidx.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.os.Environment;
-import androidx.annotation.NonNull;
 import android.view.View;
+
+import androidx.annotation.NonNull;
+import androidx.databinding.DataBindingUtil;
 
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -153,8 +154,15 @@ public class AccountActivity extends Activity implements GoogleApiClient.OnConne
     public void initGoogleLoginInit() {
         // [START config_signin]
         // Configure Google Sign In
+        String str = getString(
+                this.getResources().getIdentifier(
+                        "default_web_client_id",
+                        "string",
+                        this.getPackageName()
+                ));
+
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(getString(R.string.default_web_client_id))
+                .requestIdToken(str)
                 .requestEmail()
                 .build();
         // [END config_signin]

@@ -96,7 +96,7 @@
             app:effect="RightSlide"
             app:dynamicReloadInterval="true"
             app:reloadInterval="20"
-            app:bannerHeight="Fixed"
+            app:bannerHeight="Adaptive"
             />
     </RelativeLayout>
 </layout>

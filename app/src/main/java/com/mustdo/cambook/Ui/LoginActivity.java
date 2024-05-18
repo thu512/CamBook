@@ -4,14 +4,15 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import androidx.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import androidx.annotation.NonNull;
 import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Log;
+
+import androidx.annotation.NonNull;
+import androidx.databinding.DataBindingUtil;
 
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -221,9 +222,14 @@ public class LoginActivity extends Activity implements GoogleApiClient.OnConnect
     // google
     // 초기화
     public void initGoogleLoginInit() {
-
+        String str = getString(
+                this.getResources().getIdentifier(
+                        "default_web_client_id",
+                        "string",
+                        this.getPackageName()
+                ));
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(getString(R.string.default_web_client_id))
+                .requestIdToken(str)
                 .requestEmail()
                 .build();
 

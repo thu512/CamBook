@@ -2,11 +2,12 @@ package com.mustdo.cambook.Ui;
 
 import android.content.Context;
 import android.content.Intent;
-import androidx.databinding.DataBindingUtil;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Environment;
 import android.widget.TextView;
+
+import androidx.databinding.DataBindingUtil;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -265,11 +266,10 @@ public class TimeTableActivity extends Activity {
             //해당과목 사진 하나하나 불러오기
             for (DocumentSnapshot doc : documentSnapshots.getDocuments()) {
                 DownloadUrl url = doc.toObject(DownloadUrl.class);
-
-                U.getInstance().log("" + url.toString());
-
                 //사진 해당 디렉토리에 저장
-                savePhoto(url.getUrl(),subject, url.getFileName());
+                if (url != null) {
+                    savePhoto(url.getUrl(), subject, url.getFileName());
+                }
             }
             stopPd();
 

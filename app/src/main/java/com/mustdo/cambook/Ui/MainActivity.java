@@ -257,12 +257,12 @@ public class MainActivity extends Activity {
         }).addOnFailureListener(e -> {
             U.getInstance().log("firestorage 업로드 실패 " + e.getMessage());
         }).addOnSuccessListener(taskSnapshot -> {
-
             //여기서firestore에 다운로드 url저장
             if (taskSnapshot.getMetadata() != null && taskSnapshot.getMetadata().getReference() != null) {
-                insertFirestore(subject, taskSnapshot.getMetadata().getReference().getDownloadUrl().toString(), fileName);
-                //Log.d("TTT",""+taskSnapshot.getUploadSessionUri().getPath());
-                U.getInstance().toast(getApplicationContext(), "업로드 성공");
+                taskSnapshot.getMetadata().getReference().getDownloadUrl().addOnSuccessListener(uri -> {
+                    insertFirestore(subject, uri.toString(), fileName);
+                    U.getInstance().toast(getApplicationContext(), "업로드 성공");
+                });
             }
         });
 
